@@ -1,0 +1,27 @@
+var __config__ = 
+{
+	"window": {
+		"view table": 6
+	},
+
+	"modules": [
+	],
+
+	"elements": [
+		"{FramePath}/bin/elements/MenuPanel.js",
+		"{FramePath}/bin/elements/MenuButton.js"
+	],
+
+	"views": {
+		"mainView": "index_view_main",
+
+		"viewsList": [{
+			"path": "./bin/views/index/index_view_main.js",
+			
+			"background": {
+				"type":  "walpers",
+				"value": "./bin/shaders/main_bg.jpeg"
+			}
+		}]
+	}
+};
