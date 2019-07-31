@@ -6,7 +6,7 @@ var MenuButton = function(master)
 	this.domElement     = null;
 	this.domElementType = "div";
 	
-	this.type       = "inner";
+	this.type       = "innerElement";
 	
 	this.style = {
 		backgroundColor: "inherit",

@@ -3,9 +3,13 @@ var index_view_main = function(core)
 	var self = this,
 		than = core;
 
-	this.type  = "inner";
-	this.class = "page";
+	this.type  = "page";
 
+	this.background = {
+		type:  "color",
+		value: than.config.window.colors[10]
+	}
+	
 	this.items = [{
 		type: "inner",
 		class: "MenuPanel",
