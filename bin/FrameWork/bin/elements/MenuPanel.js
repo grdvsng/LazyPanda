@@ -1,7 +1,7 @@
-var MenuPanel = function(master)
+var MenuPanel = function(core, child)
 {
 	var self = this,
-		than = master;
+		than = core;
 	
 	this.domElement     = null;
 	this.domElementType = "div";
@@ -11,23 +11,30 @@ var MenuPanel = function(master)
 	this.position = [{
 			top: "1%"
 		}, {
-			bottom: "90"
+			bottom: "90%"
 	}];
 	
 	this.style = {
-		backgroundColor: "red",
+		backgroundColor: "orange",
+		position:        "relative",
+		color:           "black",
+		fontFamily:      than.style.fontFamily,
+		fontSize:        than.style.fontSize,
 		position:        "relative",
 		heigth:          "10%",
 		width:           "90%",
 		border:          "1px solid black"
 	} 
 
-	this.__init__ = function(params, position)
+	this.compile = function(child)
 	{
 		var posIndex = (position !== undefined) ? position:1,
 			position = this.position[posIndex];
-		this.style   = than.MethodsForObjects.objectAddition(this.style, position);
+		this.style   = than.modules.MethodsForObjects.objectAddition(this.style, position);
 		
-		console.log(this.style);
+		than.modules.MethodsForObjects.objectAddition(this, child);
+		return this;
 	}
+
+	this.compile(child);
 }

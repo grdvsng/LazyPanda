@@ -3,7 +3,7 @@ var MethodsForObjects = function(core)
 	var self = this,
 		than = core;
 
-	this.objectAddition(mainObject, addObject)
+	this.objectAddition = function(mainObject, addObject)
 	{
 		var currentObject = mainObject;
 

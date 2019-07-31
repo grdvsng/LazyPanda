@@ -23,7 +23,8 @@ var __config__ =
 
 	"elements": [
 		"{FramePath}/bin/elements/MenuPanel.js",
-		"{FramePath}/bin/elements/MenuButton.js"
+		"{FramePath}/bin/elements/MenuButton.js",
+		"{FramePath}/bin/elements/DefaultView.js"
 	],
 
 	"views": {

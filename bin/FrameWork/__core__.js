@@ -8,9 +8,12 @@ function __Core__(MyPath)
 	this.elements = {
 	}
 
+	this.views = {
+	}
+
 	this.mainView = {
 		title: null,
-		coreElement: null
+		data: null
 	}
 
 	this.localStorage = {
@@ -58,6 +61,15 @@ function __Core__(MyPath)
 		}],
 
 		onStart: [{
+			title: 'Connect Elems, Pages and Methods', 
+			
+			run: function() 
+			{
+				self.setCoreVaribleByKeyNameDict(self.elements);
+				self.setCoreVaribleByKeyNameDict(self.modules, true);
+				self.setCoreVaribleByKeyNameDict(self.views);
+			}
+		}, {
 			title: 'Set MainView', 
 			
 			run: function() 
@@ -67,44 +79,9 @@ function __Core__(MyPath)
 				
 				if ((view === null) || (view === undefined)) 
 				{
-					self.mainView.title = defView;
-					self.changeMainView(self.mainView);
+					self.changeMainView(defView);
 				} else {
 					self.changeMainView(view);
-				}
-			}
-		}, {
-			title: 'Connect modules', 
-			
-			run: function() 
-			{
-				for (var key in self.modules)
-				{
-					var att = window[key];
-
-					if ((att !== undefined) || (att !== null))
-					{
-						self.modules[key] = new att();
-					} else {
-						this.errorCatcher('Append Method or Elems Key Error', 1, key, "Inner Error");
-					}
-				}
-			}
-		}, {
-			title: 'Connect elements', 
-			
-			run: function() 
-			{
-				for (var key in self.elements)
-				{
-					var att = window[key];
-
-					if ((att !== undefined) || (att !== null))
-					{
-						self.elements[key] = att;
-					} else {
-						this.errorCatcher('Append Method or Elems Key Error', 1, key, "Inner Error");
-					}
 				}
 			}
 		}]
@@ -167,12 +144,15 @@ function __Core__(MyPath)
 	{
 		if (path.match(/modules/g)) 
 		{
-			this.elements[attKey] = null;
+			this.modules[attKey] = null;
 		}
 		else if (path.match(/elements/g)) 
 		{
-			this.modules[attKey]  = null;
-		} else if (!path.match(/view/g)){
+			this.elements[attKey]  = null;
+		} else if (path.match(/view/g))
+		{
+			this.views[attKey] = attKey;
+		} else {
 			this.errorCatcher('Append Method or Elems Key Error', 0, attKey, "Inner Error");
 		}
 	}
@@ -189,60 +169,54 @@ function __Core__(MyPath)
 		to.appendChild(what);
 	}
 
-	this.compileCoreElement = function(viewName)
-	{
-		var params = window[viewName];
-
-		if ((params === undefined) || (params === null))
-		{
-			this.errorCatcher('View Error', 1, viewName, "Inner Error");
-		} else {
-			params = new params(this);
-		}
-
-		return params;
-	}
-
 	this.compileElement = function(el)
 	{
 		var type = el.type;
 		
 		if (type === "HTMLCollection") this.compileHTMLElement(el);
 		if (type === "innerElement")   this.compileInnerElement(el);	
-		if (type === "page")           this.compilePageElement(el);	
+		if (type === "view")           this.compilePageElement(el);	
 	}
 
 	this.compileHTMLElement = function(el)
 	{
 	}
 
-	this.compileInnerElement = function(el)
+	this.compileInnerElement = function(elParams, master)
 	{
+		var element      = this.generateInnerElement(elParams, master),
+			compiler     = this.elements[element.class],
+			compiledView = new compiler(this, element),
+			items        = compiledView.items;
+
+		if (items) this.compileInnerElements(items, element);
+	}
+	
+	this.compileInnerElements = function(items, master)
+	{
+		for (var n in items)
+		{
+			var elem  = items[n];
+
+			this.compileInnerElement(elem, master);
+		}
 	}
 
-	this.compilePageElement = function(el)
+	this.changeMainView = function(view, toDestroy)
 	{
-		var bg = el.background;
-		
-		if (bg !== undefined) this.setBackground(bg);
-	}
+		var view = ((typeof view) === "object") ? view:this.getViewElement(view);
 
-	this.changeMainView = function(view)
-	{
-		this.mainView = view;
-		this.destView();
+		if (toDestroy) this.destView(toDestroy);
 
-		if (view.coreElement === null) view.coreElement = this.compileCoreElement(view.title);
-		
-		this.compileElement(view.coreElement);
+		this.compileInnerElement(view);
 		//self.localStorage.setItem('mainView', view);
 	}
 
-	this.destView = function(View)
+	this.destView = function(view)
 	{
-		var body = document.getElementsByTagName('body')[0];
+		var master = document.getElementById(view.master.id);
 
-		body.innerHtml = "";
+		master.innerHtml = "";
 	}
 
 	this.errorCatcher = function(errorType, errorNumber, args, browseError)
@@ -311,6 +285,31 @@ function __Core__(MyPath)
 			varible = ((typeof result) === "object") ? result[0].replace(/[\.\/]/g, ""):undefined;
 	
 		return varible;
+	}
+
+	this.getViewElement = function(viewName)
+	{
+		var params = window[viewName];
+
+		if ((params === undefined) || (params === null))
+		{
+			this.errorCatcher('View Error', 1, viewName, "Inner Error");
+		} else {
+			params = params;
+		}
+
+		return params;
+	}
+
+	this.generateInnerElement = function(elParams, master)
+	{
+		try {
+			return new elParams(this);
+		} catch(e) {
+			if (elParams.master === undefined) elParams.master = {type: 'InnerElement', data: master};
+			
+			return elParams;
+		}
 	}
 
 	this.globalStartConnector = function(listOfElems, elemsType, elemsMaster, paramType)
@@ -386,6 +385,22 @@ function __Core__(MyPath)
 		var body = document.getElementsByTagName('body')[0];
 
 		body.style.backgroundColor = value;
+	}
+
+	this.setCoreVaribleByKeyNameDict = function(dict, exemplar)
+	{
+		for (var key in dict)
+		{
+			var att = window[key];
+
+			if ((att !== undefined) || (att !== null))
+			{
+				if (exemplar)  dict[key] = new att();
+				if (!exemplar) dict[key] = att;
+			} else {
+				this.errorCatcher('Append Method or Elems Key Error', 1, key, "Inner Error");
+			}
+		}
 	}
 
 	this.start_schedules = function(shedulesName)
