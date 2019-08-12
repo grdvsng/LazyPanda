@@ -1,26 +1,25 @@
-var MenuButton = function(master)
+var MenuButton = function(core, child, master)
 {
 	var self = this,
-		than = master;
+		than = core;
 
+	this.class          = "MenuButton";
 	this.domElement     = null;
-	this.domElementType = "div";
-	
-	this.type       = "innerElement";
-	
-	this.style = {
-		backgroundColor: "inherit",
-		position:        "relative",
-		heigth:          "90%",
-		width:           "20%",
-		border:          "inherit",
-		borderRadius:    "10px",
-		fontSize:        "12pt",
-		fontColor:       "white"
-	}
+	this.domElementType = "button";
+	this.type           = "innerElement";
+	this.style          = than.style.parameters[this.class];
 
 	this.setText = function(data)
 	{
 		self.domElement.innerText = data;
 	}
+
+	this.compile = function(child, master)
+	{
+		than.elementCoreCompile(this, child, master);
+
+		return this;
+	}
+
+	this.compile(child, master);
 }

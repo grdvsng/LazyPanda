@@ -1,31 +1,27 @@
-var DefaultView = function(core, child)
+var DefaultView = function(core, child, master)
 {
 	var self = this,
 		than = core;
 
-	this.type   = "View";
-	this.master = null;
-
-	this.style = {
-		fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif'
-	}
+	this.type           = "View";
+	this.class          = "DefaultView";
+	this.master         = null;
+	this.domElement     = null;
+	this.domElementType = "div";
+	this.style          = than.style.parameters[this.class];
 	
-	this.background = {
-		type:  "color",
-		value: "white"
-	}
-	
-	this.items = null
+	this.background = this.style['back-ground'];
+	this.items      = null;
 
-	this.compile = function(child)
+	this.compile = function(child, master)
 	{
-		this.style = than.modules.MethodsForObjects.objectAddition(this.style, child.style);
+		this.bg = (child.background !== undefined) ?  child.background:this.background;
 		
-		than.modules.MethodsForObjects.objectAddition(this, child);
-		than.setBackground(this.background);
+		than.setBackground(this.bg);
+		than.elementCoreCompile(this, child, master);
 
 		return this;
 	}
 
-	this.compile(child);
+	this.compile(child, master);
 };

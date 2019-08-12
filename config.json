@@ -1,30 +1,16 @@
 var __config__ = 
 {
-	"window": {
-		"view table": 6,
-		"colors": [
-			"white",
-			"rgb(13, 10,   17)",
-			"rgb(38,  36,  49)",
-			"rgb(88,  93,  112)",
-			"rgb(166, 166, 176)",
-			"rgb(215, 209, 219)",
-			"rgb(185, 192, 210)",
-			"rgb(161, 185, 213)",
-			"rgb(134, 157, 211)",
-			"rgb(86,  117, 172)",
-			"rgb(20,  51,  105)"
-		]
-	},
+	"style":  "{FramePath}/bin/styles/default_style.js",
 
 	"modules": [
-		"{FramePath}/bin/modules/MethodsForObjects.js",
+		"{FramePath}/bin/modules/MethodsForObjects.js"
 	],
 
 	"elements": [
 		"{FramePath}/bin/elements/MenuPanel.js",
 		"{FramePath}/bin/elements/MenuButton.js",
-		"{FramePath}/bin/elements/DefaultView.js"
+		"{FramePath}/bin/elements/DefaultView.js",
+		"{FramePath}/bin/elements/FlexMenu.js"
 	],
 
 	"views": {

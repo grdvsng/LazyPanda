@@ -1,48 +1,36 @@
-var index_view_main = function(core)
-{
-	var self   = this,
-		than   = core,
-		master = master;
+var index_view_main = {
+	class: "DefaultView",
+	type:  "innerElement",
 
-	this.class  = "DefaultView";
-	this.master = {
+	master: {
 		id:   "__MainBody__",
 		type: "HTMLCollection"
-	};
+	},
 
-	this.style = {
+	style: {
 		width:      "100%",
-		height:     "100%",
-		fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif'
-	}
+		height:     "100%"
+	},
 	
-	this.background = {
-		type:  "color",
-		value: than.config.window.colors[10]
-	}
-	
-	this.items = [{
-		type: "inner",
-		class: "MenuPanel",
+	items: [{
+		type:     "innerElement",
+		class:    "FlexMenu",
+		position: 'top',
 
-		style: {
-			backgroundColor: than.config.window.colors[0],
-			fontFamily:      this.style.fontFamily,
-			color:           "black"
-		},
-
+		'auto-position': true,
+		
 		items: [{
-			type: "inner",
-			class: "MenuButton",
-			innerText: "Главная"
+			type:    "innerElement",
+			class:   "MenuButton",
+			content: "Главная"
 		}, {
-			type: "inner",
-			class: "MenuButton",
-			innerText: "О Компании"
+			type:    "innerElement",
+			class:   "MenuButton",
+			content: "О Компании"
 		}, {
-			type: "inner",
-			class: "MenuButton",
-			innerText: "Контакты"
+			type:    "innerElement",
+			class:   "MenuButton",
+			content: "Контакты"
 		}]
 	}]
 };

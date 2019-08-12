@@ -1,90 +1,58 @@
-function __Core__(MyPath)
+function __Core__(MyPath, debug)
 {
-	var self = this;
+	var self  = this,
+		debug = (debug !== undefined);
 
-	this.modules = {
+	this.style = {
+		title: null,
+		parameters: null
 	}
 
 	this.elements = {
 	}
 
-	this.views = {
-	}
-
-	this.mainView = {
-		title: null,
-		data: null
-	}
-
-	this.localStorage = {
-		onError: function(e)
+	this.UI_effects = {
+		'pursuit of scroll':
 		{
-			self.errorCatcher('Browser Error', 0, null, e);
-		},
+			event: 'scroll',
 
-		getItem: function(key)
-		{
-			var result;
-			
-			try {
-				result = localStorage.getItem(key);
-			} catch(e) {
-				result = undefined;
-				this.onError(e);
+			def: function(target)
+			{
+				return function()
+				{
+					target.style.top = self.scrollTop();
+				}
+			},
+
+			compile: function(innerElement)
+			{
+				var elem = innerElement.domElement,
+					func = this.def(elem);
+
+				document.addEventListener(this.event, func);
 			}
-
-			return undefined;
 		},
 
-		setItem: function(key, data)
+		'click effect 1':
 		{
-			try {
-				localStorage.setItem(key, data);
-			} catch(e) {
-				this.onError(e);
+			event: 'click',
+
+			def: function(target)
+			{
+				return function()
+				{
+					target.style.top = self.scrollTop();
+				}
+			},
+
+			compile: function(innerElement)
+			{
+				var elem = innerElement.domElement,
+					func = this.def(elem);
+
+				elem.addEventListener(this.event, func);
 			}
 		}
-	}
-
-	this.shedules = {
-		onLoad: [{
-			title: 'Connect modules and elements', 
-			
-			run:  function()
-			{
-				var master = document.getElementsByTagName('head')[0];
-
-				self.globalStartConnector(self.config.modules,         'script', master, 'src');
-				self.globalStartConnector(self.config.elements,        'script', master, 'src');
-				self.globalStartConnector(self.config.views.viewsList, 'script', master, 'src');
-			}
-		}],
-
-		onStart: [{
-			title: 'Connect Elems, Pages and Methods', 
-			
-			run: function() 
-			{
-				self.setCoreVaribleByKeyNameDict(self.elements);
-				self.setCoreVaribleByKeyNameDict(self.modules, true);
-				self.setCoreVaribleByKeyNameDict(self.views);
-			}
-		}, {
-			title: 'Set MainView', 
-			
-			run: function() 
-			{
-				var view    = self.localStorage.getItem('mainView'),
-					defView = self.config.views.mainView;
-				
-				if ((view === null) || (view === undefined)) 
-				{
-					self.changeMainView(defView);
-				} else {
-					self.changeMainView(view);
-				}
-			}
-		}]
 	}
 
 	this.innerErrors = {
@@ -129,7 +97,117 @@ function __Core__(MyPath)
 		}, {
 			type:    "warning",
 			message: "Can't find method for: '{0}'."
+		}],
+
+		'Connect Element Error': [{
+			type:    "warning",
+			message: "Can't find master for: \n'{0}'."
 		}]
+	}
+
+	this.localStorage = {
+		onError: function(e)
+		{
+			self.errorCatcher('Browser Error', 0, null, e);
+		},
+
+		getItem: function(key)
+		{
+			var result;
+			
+			try {
+				result = localStorage.getItem(key);
+			} catch(e) {
+				result = undefined;
+				this.onError(e);
+			}
+
+			return undefined;
+		},
+
+		setItem: function(key, data)
+		{
+			try {
+				localStorage.setItem(key, data);
+			} catch(e) {
+				this.onError(e);
+			}
+		}
+	}
+
+	this.mainView = {
+		title: null,
+		data: null
+	}
+
+	this.modules = {
+	}
+
+	this.shedules = {
+		onLoad: [{
+			title: 'Connect modules and elements', 
+			
+			run:  function()
+			{
+				var master = document.getElementsByTagName('head')[0],
+					paths  = [
+						self.config.modules, 
+						self.config.style,
+						self.config.elements,
+						self.config.views.viewsList
+					];
+
+				for (var n=0; n < paths.length; n++) 
+				{
+					var list = ((typeof paths[n]) !== 'string') ? paths[n]:[paths[n]];
+
+					self.globalStartConnector(list,  'script', master, 'src');
+				}
+			}
+		}],
+
+		onStart: [{
+			title: 'Change Style for device', 
+			
+			run:  function()
+			{
+				var style = window[self.style.title];
+
+				if(window.innerWidth <= 800 && window.innerHeight <= 600 && (window.innerWidth >= window.innerHeight)) 
+				{
+					self.style.parameters = self.viewStyleCompile(style, 'mobile');
+				} else {
+					self.style.parameters = self.viewStyleCompile(style, 'desktop');
+				}
+			}
+		}, {
+			title: 'Connect Elems, Pages and Methods', 
+			
+			run: function() 
+			{
+				self.setCoreVaribleByKeyNameDict(self.elements);
+				self.setCoreVaribleByKeyNameDict(self.modules, true);
+				self.setCoreVaribleByKeyNameDict(self.views);
+			}
+		}, {
+			title: 'Set MainView', 
+			
+			run: function() 
+			{
+				var view    = self.localStorage.getItem('mainView'),
+					defView = self.config.views.mainView;
+				
+				if ((view === null) || (view === undefined)) 
+				{
+					self.changeMainView(defView);
+				} else {
+					self.changeMainView(view);
+				}
+			}
+		}]
+	}
+
+	this.views = {
 	}
 
 	this.__init__ = function(MyPath)
@@ -149,14 +227,34 @@ function __Core__(MyPath)
 		else if (path.match(/elements/g)) 
 		{
 			this.elements[attKey]  = null;
-		} else if (path.match(/view/g))
+		} 
+		else if (path.match(/view/g))
 		{
 			this.views[attKey] = attKey;
+		} 
+		else if (path.match(/style/g)) 
+		{
+			this.style.title = attKey;
 		} else {
 			this.errorCatcher('Append Method or Elems Key Error', 0, attKey, "Inner Error");
 		}
 	}
- 	
+
+ 	this.arrayAddition = function(arr1, arr2)
+ 	{
+ 		var arr1 = (arr1 !== undefined) ? arr1:[],
+ 			arr2 = (arr2 !== undefined) ? arr2:[];
+
+ 		for (var n=0; n < arr2.length; n++)
+ 		{
+ 			var val = arr2[n];
+
+ 			arr1.push(val);
+ 		}
+
+ 		return arr1;
+ 	}
+
  	this.connect = function(what, to, attributes)
 	{
 		for (var key in attributes)
@@ -169,36 +267,107 @@ function __Core__(MyPath)
 		to.appendChild(what);
 	}
 
-	this.compileElement = function(el)
+	this.compileTextLabel = function(el, label)
 	{
-		var type = el.type;
+		var domElement = el.domElement,
+			elemType   = (label.position !== 'top' && label.position !== 'bottom') ? 'td':'tr',
+			elem       = document.createElement(elemType);
 		
-		if (type === "HTMLCollection") this.compileHTMLElement(el);
-		if (type === "innerElement")   this.compileInnerElement(el);	
-		if (type === "view")           this.compilePageElement(el);	
+		label.style      = this.objectAddition(el.style.label, label.style);
+		label.content    = "<span>" + label.content + "</span>";
+		label.domElement = this.connectInnerAttsToHTMLObject(label, elem, el);
+		
+		if (label.position === 'left' || label.position === 'top')   
+		{
+			domElement.insertBefore(label.domElement, domElement.firstChild);
+		} else {
+		    domElement.appendChild(label.domElement);
+		}
+
+		return label;
 	}
 
-	this.compileHTMLElement = function(el)
+	this.connectInnerAttsToHTMLObject = function(innerElement, HTMLElement, paramsForElement)
 	{
+		HTMLElement.innerHTML += (innerElement.content !== undefined) ? innerElement.content:"";
+		
+		this.objectAddition(HTMLElement.style, innerElement.style);
+		this.objectAddition(HTMLElement, innerElement.events);
+		this.generateDictWithIdAndClassAttributs(innerElement, HTMLElement);
+
+		if (innerElement.effects) 
+		{
+			if (paramsForElement) this.arrayAddition(innerElement.effects, innerElement.paramsForElement);
+			this.compileEffectsToElement(innerElement);
+		}
+
+		return HTMLElement;
 	}
 
-	this.compileInnerElement = function(elParams, master)
+	this.compileElement = function(el, master)
 	{
-		var element      = this.generateInnerElement(elParams, master),
-			compiler     = this.elements[element.class],
-			compiledView = new compiler(this, element),
-			items        = compiledView.items;
+		var type  = el.type;
+		el.master = (el.master !== undefined) ? el.master:master;
+		
+		if (type === "HTMLCollection")   var elem = this.compileHTMLElement(el, master);
+		if (type === "innerElement")     var elem = this.compileInnerElement(el, master);		
+		if (elem.onRender !== undefined) elem.onRender();
+	}
 
-		if (items) this.compileInnerElements(items, element);
+	this.compileEffectsToElement = function(innerElement)
+	{
+		var effects = innerElement.effects;
+
+		for (var n=0; n < effects.length; n++)
+		{
+			var name = effects[n],
+			    data = this.UI_effects[name];
+
+		   data.compile(innerElement);
+		}
+	}
+
+	this.compileHTMLElement = function(el, master)
+	{
+		var element = document.createElement(el.htmlClass),
+			master  = (master.domElement === undefined) ? master:master.domElement,
+			items   = el.items;
+
+		this.connectInnerAttsToHTMLObject(el, element);
+		if (items) this.compileElements(items, element);
+
+		if (!debug) 
+		{
+			try      {master.appendChild(element);} 
+			catch(e) {this.errorCatcher('Connect Element Error', 0, el.htmlClass, e);}
+		} else {
+			master.appendChild(element);
+		}
+
+		return element;
+	}
+
+	this.compileInnerElement = function(element, master)
+	{
+		var compiler = this.elements[element.class],
+			master   = (element.master !== undefined) ? element.master:master,
+			compiled = new compiler(this, element, master),
+			items    = compiled.items,
+			label    = element.label;
+
+		if (items) this.compileElements(items, element);
+		if (label) compiled.label = this.compileTextLabel(compiled, element.label);	
+		
+		return compiled;
 	}
 	
-	this.compileInnerElements = function(items, master)
+	this.compileElements = function(items, master)
 	{
 		for (var n in items)
 		{
 			var elem  = items[n];
 
-			this.compileInnerElement(elem, master);
+			this.compileElement(elem, master);
 		}
 	}
 
@@ -212,11 +381,64 @@ function __Core__(MyPath)
 		//self.localStorage.setItem('mainView', view);
 	}
 
+	this.changeHTMLElementTag = function(element, tag)
+	{
+		console.log(element, tag);
+	}
+
+ 	this.createMirrorHTMLElement = function(element)
+ 	{
+
+ 	}
+
 	this.destView = function(view)
 	{
 		var master = document.getElementById(view.master.id);
 
 		master.innerHtml = "";
+	}
+
+	this.elementCoreCompile = function(elemConstructor, child, master)
+	{
+		var element = document.createElement(elemConstructor.domElementType),
+			master  = this.getMaster(master);
+		
+		elemConstructor.style      = this.objectAddition(elemConstructor.style, child.style);
+		elemConstructor.domElement = element;
+		elemConstructor            = this.objectAddition(elemConstructor, child);
+
+		this.connectInnerAttsToHTMLObject(elemConstructor, element, child);
+
+		if (!debug) 
+		{
+			try {
+				master.appendChild(element);
+			} catch(e) {
+				this.errorCatcher('Connect Element Error', 0, elemConstructor.domElement, e);
+			}
+		} else {
+			master.appendChild(element);
+		} 
+	}
+	
+	this.elementStyleCompile = function(el, params)
+	{
+		var elem = el;
+
+		for (var key in params)
+		{
+			var val = params[key]
+				att = elem[key];
+			
+			if ((typeof val) === 'object' && (typeof att) === 'object') 
+			{
+				elem[key] = this.objectAddition(att, val);
+			} else {
+				elem[key] = val;
+			}
+		}
+
+		return elem;
 	}
 
 	this.errorCatcher = function(errorType, errorNumber, args, browseError)
@@ -272,13 +494,44 @@ function __Core__(MyPath)
 		}
 	}
 
+	this.generateDictWithIdAndClassAttributs = function(innerElement, HTMLElement)
+	{
+		for (var key in innerElement) 
+		{
+			var val = innerElement[key];
+			
+			if ((key === "id") || (key === "class"))
+			{
+				HTMLElement.setAttribute(key, val);
+			} 
+		}
+
+		return HTMLElement;
+	}
+
 	this.getAndCallMainFunctionFromElemPath = function(path)
 	{
 		var cleanName = path.replace(/(?!\/).*?(?=\/)|\//g, "").split('.')[0];
 		
 		return window[cleanName];
 	}
+	
+	this.getMaster = function(master)
+	{
+		if ((master !== undefined) && (master !== null))
+		{
 
+			if ((master.domElement !== undefined) && (master.domElement !== null)) 
+			{
+				return master.domElement;
+			}
+			else if ((master.id !== undefined) && (master.id !== null))
+			{
+				return document.getElementById(master.id);
+			}
+		}
+	}
+	
 	this.getMethodVaribleByPath = function(val)
 	{
 		var result  = val.match(/\/{1,1}[^\/]+\.{1,1}/g),
@@ -301,17 +554,6 @@ function __Core__(MyPath)
 		return params;
 	}
 
-	this.generateInnerElement = function(elParams, master)
-	{
-		try {
-			return new elParams(this);
-		} catch(e) {
-			if (elParams.master === undefined) elParams.master = {type: 'InnerElement', data: master};
-			
-			return elParams;
-		}
-	}
-
 	this.globalStartConnector = function(listOfElems, elemsType, elemsMaster, paramType)
 	{	
 		for (var n in listOfElems)
@@ -326,6 +568,24 @@ function __Core__(MyPath)
 			
 			this.connect(elem, elemsMaster, params);
 		}
+	}
+
+	this.objectAddition = function(mainObject, addObject, appended)
+	{
+		var currentObject = (mainObject !== undefined) ? mainObject:{},
+			addObject     = (addObject !== undefined)  ? addObject:{};
+
+		for (var att in addObject)
+		{
+			currentObject[att] = addObject[att];
+		}
+
+		if (appended === undefined) 
+		{
+			currentObject = this.objectAddition(addObject, currentObject, true);
+		}
+		
+		return currentObject;
 	}
 
 	this.replaceKeyInStringByCoreVariable = function(str)
@@ -351,7 +611,16 @@ function __Core__(MyPath)
 
 		return this.format(str, args);
 	}
-	
+
+	this.scrollTop = function() 
+	{
+		var scrollY = (window.scrollY) ? window.scrollY:0,
+			rect    = document.body.getBoundingClientRect(),
+			result  = Math.max(scrollY, window.pageYOffset, rect.top);
+		
+		return result + 'px';
+	}
+
 	this.setBackground = function(backGround)
 	{
 		var type = backGround.type;
@@ -412,15 +681,33 @@ function __Core__(MyPath)
 		for (var n=0; n < shedules.length; n++)
 		{
 			var shedule = shedules[n];
+			shedule.run = (shedule.run !== undefined) ? shedule.run:shedule.compile(this, shedule.compileArgs);
 
-			try {
-				shedule.run = (shedule.run !== undefined) ? shedule.run:shedule.compile(this, shedule.compileArgs);
-				shedule.run();
-			} catch(e) {
-				this.errorCatcher('Shedules Error', 1, shedule.title, e);
-			}
+				if (!debug) 
+				{
+					try {shedule.run();} 
+					catch(e) {this.errorCatcher('Shedules Error', 1, shedule.title, e);}
+				} else {
+					shedule.run();
+				}
 		}
-	} 
+	}
+
+	this.viewStyleCompile = function(styles, mode)
+	{
+		var style = styles[mode];
+
+		for (var elemName in styles.universal)
+		{
+			var params    = styles.universal[elemName],
+				elem      = style[elemName],
+				elemStyle = self.elementStyleCompile(elem, params);
+			
+			elem = elemStyle; 
+		}
+
+		return style;
+	}
 
 	this.__init__(MyPath);
 }
