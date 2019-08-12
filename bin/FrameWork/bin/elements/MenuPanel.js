@@ -3,11 +3,11 @@ var MenuPanel = function(core, child, master)
 	var self = this,
 		than = core;
 	
-	this.class          = "MenuPanel";
-	this.domElement     = null;
-	this.domElementType = "div";
-	this.style          = than.style.parameters[this.class];
-	this.type           = "innerElement";
+	this.class      = "MenuPanel";
+	this.domElement = null;
+	this.htmlClass  = (child.htmlClass === undefined) ? "table":child.htmlClass;
+	this.style      = than.style.parameters[this.class];
+	this.type       = "innerElement";
 	
 	this.position = {
 		top: "1%",
@@ -21,10 +21,6 @@ var MenuPanel = function(core, child, master)
 		
 		this.style   = than.modules.MethodsForObjects.objectAddition(position, this.style);
 		child.master = this.master;
-		
-		than.elementCoreCompile(this, child, master);
-
-		return this;
 	}
 
 	this.compile(child, master);

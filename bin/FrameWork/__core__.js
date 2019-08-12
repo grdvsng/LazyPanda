@@ -8,7 +8,62 @@ function __Core__(MyPath, debug)
 		parameters: null
 	}
 
+	this.objects = [
+	]
+
 	this.elements = {
+	}
+
+	this.elementsDefaultFunction = {
+		
+		__del__: function()
+		{
+			this.removeChildren();
+			this.domElement.parentNode.removeChild(this.domElement);
+
+			for (var att in this) delete this[att];
+
+			//self.masterUpdateObjectsList(); нужно сделать
+		},
+		
+		changeHTMLElementTag: function(newTag)
+		{
+			self.changeHTMLElementTag(this, newTag);
+		},
+
+		removeChildren: function()
+		{
+			for (var n=0; n < this.domElement.childNodes.length; n++)
+			{
+				var child = this.domElement.childNodes[n];
+
+				try {
+					child.super.__del__();
+				} catch(e) {
+					child.innerHTML = "";
+					child.parentNode.removeChild(child);
+				}
+			}
+		},
+
+		resize: function(x, y)
+		{
+			this.domElement.style.width  = y; 
+			this.domElement.style.height = x;
+		},
+
+		setColorFilter: function(type, precent, byString)
+		{
+			var byString = (precent === undefined && byString === undefined) ? type:byString;
+
+			if (byString === undefined) this.domElement.style.filter = type + "(" + precent + "%)";
+			if (byString !== undefined) this.domElement.style.filter = byString;
+		},
+
+		getElement: function()
+		{
+			return this.domElement;
+		}
 	}
 
 	this.UI_effects = {
@@ -35,22 +90,42 @@ function __Core__(MyPath, debug)
 
 		'click effect 1':
 		{
-			event: 'click',
+			event: 'mousedown',
 
-			def: function(target)
+			def: function (element)
 			{
-				return function()
+				return function(event)
 				{
-					target.style.top = self.scrollTop();
+					var elem      = (this.super.domElement !== undefined) ? this.super.domElement:this.super,
+						rect      = elem.getBoundingClientRect(),
+						nowX      = rect.height,
+						nowY      = rect.width,
+						newX      = (nowX * 0.95) + 'px',
+						newY      = (nowY * 0.95) + 'px',
+						nowFilter = element.master.domElement.style.filter;
+
+					element.master.resize(newX, newY);
+					element.master.setColorFilter("grayscale", 40);
+
+					this.addEventListener('mouseup',
+						function() 
+						{
+							element.master.resize(nowX + 'px', nowY + 'px');
+							element.master.setColorFilter(nowFilter);
+						}
+					);
 				}
 			},
 
 			compile: function(innerElement)
 			{
-				var elem = innerElement.domElement,
-					func = this.def(elem);
+				var master = innerElement.domElement,
+					elem   = self.createHideMirrorHTMLElement(innerElement);
 
-				elem.addEventListener(this.event, func);
+				master.insertBefore(elem.domElement, master.firstChild);
+				elem.domElement.addEventListener(this.event, this.def(elem));
+
+				innerElement.mirror = elem;
 			}
 		}
 	}
@@ -218,6 +293,21 @@ function __Core__(MyPath, debug)
 		this.start_schedules('onLoad'); 
 	}
 
+	this.appendFunctionOnInnerElementOnRender = function(innerElement)
+	{
+		var compileParams = innerElement.compile_parameters,
+			oldRender     = innerElement.onRender;
+
+		if (compileParams.effects) this.arrayAddition(innerElement.effects, compileParams.effects);
+
+		innerElement.onRender = function()
+		{
+			if (innerElement.onRender) oldRender();
+			
+			self.compileEffectsToElement(innerElement);
+		}
+	}
+
 	this.appendMethodOrElemKey = function(path, attKey)
 	{
 		if (path.match(/modules/g)) 
@@ -290,28 +380,35 @@ function __Core__(MyPath, debug)
 	this.connectInnerAttsToHTMLObject = function(innerElement, HTMLElement, paramsForElement)
 	{
 		HTMLElement.innerHTML += (innerElement.content !== undefined) ? innerElement.content:"";
-		
+
 		this.objectAddition(HTMLElement.style, innerElement.style);
 		this.objectAddition(HTMLElement, innerElement.events);
 		this.generateDictWithIdAndClassAttributs(innerElement, HTMLElement);
-
-		if (innerElement.effects) 
-		{
-			if (paramsForElement) this.arrayAddition(innerElement.effects, innerElement.paramsForElement);
-			this.compileEffectsToElement(innerElement);
-		}
 
 		return HTMLElement;
 	}
 
 	this.compileElement = function(el, master)
 	{
-		var type  = el.type;
-		el.master = (el.master !== undefined) ? el.master:master;
+		var type  = el.type
+			elem  = undefined;
 		
-		if (type === "HTMLCollection")   var elem = this.compileHTMLElement(el, master);
-		if (type === "innerElement")     var elem = this.compileInnerElement(el, master);		
+		el.compile_parameters = this.cloneObject(el);
+		el.master             = (el.master !== undefined)       ? el.master:master;
+		master.children       = (master.children !== undefined) ? master.children:[];
+
+		if (type === "HTMLCollection")   elem = this.compileHTMLElement(el, master);
+		if (type === "innerElement")     elem = this.compileInnerElement(el, master);		
+		if (elem.effects)                this.appendFunctionOnInnerElementOnRender(elem);     
 		if (elem.onRender !== undefined) elem.onRender();
+		
+		elem.domElement.super = elem;
+
+		this.objectAddition(elem, this.elementsDefaultFunction);
+		this.objects.push(elem);
+		master.children.push(elem);
+
+		return elem;
 	}
 
 	this.compileEffectsToElement = function(innerElement)
@@ -332,9 +429,13 @@ function __Core__(MyPath, debug)
 		var element = document.createElement(el.htmlClass),
 			master  = (master.domElement === undefined) ? master:master.domElement,
 			items   = el.items;
-
+		
 		this.connectInnerAttsToHTMLObject(el, element);
-		if (items) this.compileElements(items, element);
+		
+		el.compile_parameters = el;
+		el.domElement         = element;
+
+		if (items) this.compileElements(items, el);
 
 		if (!debug) 
 		{
@@ -344,14 +445,15 @@ function __Core__(MyPath, debug)
 			master.appendChild(element);
 		}
 
-		return element;
+		return el;
 	}
 
 	this.compileInnerElement = function(element, master)
 	{
 		var compiler = this.elements[element.class],
 			master   = (element.master !== undefined) ? element.master:master,
-			compiled = new compiler(this, element, master),
+			exemplar = new compiler(this, element, master),
+			compiled = this.elementCoreCompile(exemplar, element, master),
 			items    = compiled.items,
 			label    = element.label;
 
@@ -367,7 +469,7 @@ function __Core__(MyPath, debug)
 		{
 			var elem  = items[n];
 
-			this.compileElement(elem, master);
+			items[n] = this.compileElement(elem, master);
 		}
 	}
 
@@ -381,46 +483,89 @@ function __Core__(MyPath, debug)
 		//self.localStorage.setItem('mainView', view);
 	}
 
-	this.changeHTMLElementTag = function(element, tag)
+	this.changeHTMLElementTag = function(element, newTag)
 	{
-		console.log(element, tag);
+		element.compile_parameters.htmlClass = newTag;
+
+		var elem = this.compileElement(element.compile_parameters, element.master);
+
+		element.__del__();
 	}
 
- 	this.createMirrorHTMLElement = function(element)
+ 	this.createHideMirrorHTMLElement = function(element)
  	{
+ 		var elem  = (element.domElement !== undefined) ? element.domElement:element,
+ 			rect  = elem.getBoundingClientRect(),
+ 			clone = {
+ 				domElement: document.createElement('div'),
+ 				master:     element,
 
+ 				style: 
+ 				{
+	 				position: 'absolute',
+	 				left:     '0%',
+	 				right:    '0%',
+	 				width:    rect.width  + 'px',
+	 				height:   rect.height + 'px'
+ 				}
+ 			};
+ 		
+		clone.domElement.super     =  clone;
+		clone.domElement.className = 'Hide_Mirror_Elements';
+
+ 		this.objectAddition(clone.domElement.style, clone.style);
+		this.objects.push(clone);
+ 		
+ 		return clone;
  	}
 
+ 	this.cloneObject = function(toObj)
+ 	{
+ 		var object = {};
+
+ 		for (var att in toObj)
+ 		{
+ 			object[att] = ((typeof toObj[att]) !== 'object') ? toObj[att]:this.cloneObject(toObj[att]);
+ 		}
+
+ 		return object;
+ 	}
+	
 	this.destView = function(view)
 	{
+		console.log(view)
+		/*
 		var master = document.getElementById(view.master.id);
 
 		master.innerHtml = "";
+		*/
 	}
 
-	this.elementCoreCompile = function(elemConstructor, child, master)
+	this.elementCoreCompile = function(exemplar, child, master)
 	{
-		var element = document.createElement(elemConstructor.domElementType),
+		var element = document.createElement(exemplar.htmlClass),
 			master  = this.getMaster(master);
 		
-		elemConstructor.style      = this.objectAddition(elemConstructor.style, child.style);
-		elemConstructor.domElement = element;
-		elemConstructor            = this.objectAddition(elemConstructor, child);
+		child.style      = this.objectAddition(child.style, exemplar.style);
+		child.domElement = element;
+		child            = this.objectAddition(exemplar, child);
 
-		this.connectInnerAttsToHTMLObject(elemConstructor, element, child);
+		this.connectInnerAttsToHTMLObject(exemplar, element, child);
 
 		if (!debug) 
 		{
 			try {
 				master.appendChild(element);
 			} catch(e) {
-				this.errorCatcher('Connect Element Error', 0, elemConstructor.domElement, e);
+				this.errorCatcher('Connect Element Error', 0, exemplar.domElement, e);
 			}
 		} else {
 			master.appendChild(element);
-		} 
+		}
+
+		return exemplar; 
 	}
-	
+
 	this.elementStyleCompile = function(el, params)
 	{
 		var elem = el;
@@ -578,11 +723,6 @@ function __Core__(MyPath, debug)
 		for (var att in addObject)
 		{
 			currentObject[att] = addObject[att];
-		}
-
-		if (appended === undefined) 
-		{
-			currentObject = this.objectAddition(addObject, currentObject, true);
 		}
 		
 		return currentObject;

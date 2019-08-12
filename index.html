@@ -15,6 +15,9 @@
       window.onload = function()
       {
         App.start_schedules('onStart');
+        console.log(App.objects);
+        App.objects[0].__del__();
+        console.log(App.objects);
       }
     </script>
   </head>
