@@ -1,15 +1,37 @@
-function __Core__(MyPath, debug)
+/*  Class __Core__(debug).
+	
+	Описание: 
+		Ядро фреймворка.
+	
+	Параметр(ы):
+		______________________________________________________________________
+		 ---- Наименование ---- | -------- Тип ------- | ----- Описание -----
+		________________________|______________________|______________________
+		 debug 			        | Boolean              | Режим отладки, если true выключаем внутренний обработчик ошибок.
+		________________________|______________________|______________________
+	
+	Атрибут(ы): 
+		______________________________________________________________________
+		 ---- Наименование ---- | -------- Тип ------- | ----- Описание -----
+		________________________|______________________|______________________
+		elements 				| Object               | Словарь генирующийся при подключении елементов к приложению, содержит ссылки на конструктор элементов;
+		elementsDefaultFunction | Object               | Словарь с стандартными для всех элементов функциями, которые подключаются к элементу при генерации;
+		innerErrors             | Object               | Словарь с внутренними ошибками приложения.
+		localStorage            | Object               | Объект для работы с localStorage (если поддерживается браузером);
+		mainView                | Object               | Объект главного представления приложения (аналог BODY);
+		modules                 | Object               | Словарь генирующийся при подключении модулей к приложению, содержит ссылки на конструктор модулей.
+		objects                 | Array                | Список всех подключенных елементов в приложении;
+		shedules                | Object               | Словарь с задачами для приложения.
+		style                   | Object               | Основной стиль приложения, задается в файле конфигурации;
+		UI_effects              | Object               | Словарь с объектами стандартных графических эффетов; 
+		views                   | Object               | Словарь генирующийся при подключении представлений к приложению, содержит ссылки на конструктор представлений.
+		________________________|______________________|______________________
+
+*/
+function __Core__(debug)
 {
-	var self  = this,
-		debug = (debug !== undefined);
-
-	this.style = {
-		title: null,
-		parameters: null
-	}
-
-	this.objects = [
-	]
+	var self  = this,					
+		debug = (debug !== undefined); 
 
 	this.elements = {
 	}
@@ -64,6 +86,178 @@ function __Core__(MyPath, debug)
 		{
 			return this.domElement;
 		}
+	}
+
+	this.innerErrors = {
+		'View Error': [{
+			type:    "error",
+			message: "Can't compile view: '{0}', check your views."
+		}, {
+			type:    "error",
+			message: "Parameters for view: '{0}', not found."
+		}],
+
+		'Shedules Error': [{
+				type:    "warning",
+				message: "Shedules: '{0}', not found."
+		},  {
+				type:    "error",
+				message: "Can't run shedule: '{0}'."
+			}
+		],
+
+		'Replace Key In String By Core Variable': [{
+			type:    "warning",
+			message: "Variable: '{0}', not found in Core."
+		}],
+
+		'Background Error': [{
+			type:    "warning",
+			message: "Background: '{0}', type '{1}', not found."
+		}, {
+			type:    "warning",
+			message: "Background: '{0}', incorect object."
+		}],
+
+		'Browser Error': [{
+			type:    "warning",
+			message: "Browser not support localStorage"
+		}],
+
+		'Append Method or Elems Key Error': [{
+			type:    "warning",
+			message: "Can't find typeof: '{0}'."
+		}, {
+			type:    "warning",
+			message: "Can't find method for: '{0}'."
+		}],
+
+		'Connect Element Error': [{
+			type:    "warning",
+			message: "Can't find master for: \n'{0}'."
+		}],
+
+		'Files Errors': [{
+			type:    "error",
+			message: "No one script match '{0}'."
+		}]
+	}
+
+	this.localStorage = {
+		onError: function(e)
+		{
+			self.errorCatcher('Browser Error', 0, null, e);
+		},
+
+		getItem: function(key)
+		{
+			var result;
+			
+			try {
+				result = localStorage.getItem(key);
+			} catch(e) {
+				result = undefined;
+				this.onError(e);
+			}
+
+			return undefined;
+		},
+
+		setItem: function(key, data)
+		{
+			try {
+				localStorage.setItem(key, data);
+			} catch(e) {
+				this.onError(e);
+			}
+		}
+	}
+
+	this.mainView = {
+		title: null,
+		data: null
+	}
+
+	this.modules = {
+	}
+
+	this.objects = [
+	]
+
+	this.shedules = {
+		onLoad: [{
+			title: 'Connect modules and elements', 
+			
+			run:  function()
+			{
+				var master = document.getElementsByTagName('head')[0],
+					paths  = [
+						self.config.modules, 
+						self.config.style,
+						self.config.elements,
+						self.config.views.viewsList
+					];
+
+				for (var n=0; n < paths.length; n++) 
+				{
+					var list = ((typeof paths[n]) !== 'string') ? paths[n]:[paths[n]];
+
+					self.globalStartConnector(list,  'script', master, 'src');
+				}
+			}
+		}],
+
+		onStart: [{
+			title: 'Change Style for device', 
+			
+			run:  function()
+			{
+				var style = window[self.style.title];
+
+				if(window.innerWidth <= 800 && window.innerHeight <= 600 && (window.innerWidth >= window.innerHeight)) 
+				{
+					self.style.parameters = self.viewStyleCompile(style, 'mobile');
+				} else {
+					self.style.parameters = self.viewStyleCompile(style, 'desktop');
+				}
+			}
+		}, {
+			title: 'Connect Elems, Pages and Methods', 
+			
+			run: function() 
+			{
+				self.setCoreVaribleByKeyNameDict(self.elements);
+				self.setCoreVaribleByKeyNameDict(self.modules, true);
+				self.setCoreVaribleByKeyNameDict(self.views);
+			}
+		}, {
+			title: 'Set MainView', 
+			
+			run: function() 
+			{
+				var view    = self.localStorage.getItem('mainView'),
+					defView = self.config.views.mainView;
+				
+				if ((view === null) || (view === undefined)) 
+				{
+					self.changeMainView(defView);
+				} else {
+					self.changeMainView(view);
+				}
+			}
+		}, {
+			title: 'HIDE Scripts', 
+			
+			run: function() 
+			{
+				self.destroyClass('script');
+			}
+		}]
+	}
+
+	this.style = {
+		title: null,
+		parameters: null
 	}
 
 	this.UI_effects = {
@@ -130,167 +324,22 @@ function __Core__(MyPath, debug)
 		}
 	}
 
-	this.innerErrors = {
-		'View Error': [{
-			type:    "error",
-			message: "Can't compile view: '{0}', check your views."
-		}, {
-			type:    "error",
-			message: "Parameters for view: '{0}', not found."
-		}],
-
-		'Shedules Error': [{
-				type:    "warning",
-				message: "Shedules: '{0}', not found."
-		},  {
-				type:    "error",
-				message: "Can't run shedule: '{0}'."
-			}
-		],
-
-		'Replace Key In String By Core Variable': [{
-			type:    "warning",
-			message: "Variable: '{0}', not found in Core."
-		}],
-
-		'Background Error': [{
-			type:    "warning",
-			message: "Background: '{0}', type '{1}', not found."
-		}, {
-			type:    "warning",
-			message: "Background: '{0}', incorect object."
-		}],
-
-		'Browser Error': [{
-			type:    "warning",
-			message: "Browser not support localStorage"
-		}],
-
-		'Append Method or Elems Key Error': [{
-			type:    "warning",
-			message: "Can't find typeof: '{0}'."
-		}, {
-			type:    "warning",
-			message: "Can't find method for: '{0}'."
-		}],
-
-		'Connect Element Error': [{
-			type:    "warning",
-			message: "Can't find master for: \n'{0}'."
-		}]
-	}
-
-	this.localStorage = {
-		onError: function(e)
-		{
-			self.errorCatcher('Browser Error', 0, null, e);
-		},
-
-		getItem: function(key)
-		{
-			var result;
-			
-			try {
-				result = localStorage.getItem(key);
-			} catch(e) {
-				result = undefined;
-				this.onError(e);
-			}
-
-			return undefined;
-		},
-
-		setItem: function(key, data)
-		{
-			try {
-				localStorage.setItem(key, data);
-			} catch(e) {
-				this.onError(e);
-			}
-		}
-	}
-
-	this.mainView = {
-		title: null,
-		data: null
-	}
-
-	this.modules = {
-	}
-
-	this.shedules = {
-		onLoad: [{
-			title: 'Connect modules and elements', 
-			
-			run:  function()
-			{
-				var master = document.getElementsByTagName('head')[0],
-					paths  = [
-						self.config.modules, 
-						self.config.style,
-						self.config.elements,
-						self.config.views.viewsList
-					];
-
-				for (var n=0; n < paths.length; n++) 
-				{
-					var list = ((typeof paths[n]) !== 'string') ? paths[n]:[paths[n]];
-
-					self.globalStartConnector(list,  'script', master, 'src');
-				}
-			}
-		}],
-
-		onStart: [{
-			title: 'Change Style for device', 
-			
-			run:  function()
-			{
-				var style = window[self.style.title];
-
-				if(window.innerWidth <= 800 && window.innerHeight <= 600 && (window.innerWidth >= window.innerHeight)) 
-				{
-					self.style.parameters = self.viewStyleCompile(style, 'mobile');
-				} else {
-					self.style.parameters = self.viewStyleCompile(style, 'desktop');
-				}
-			}
-		}, {
-			title: 'Connect Elems, Pages and Methods', 
-			
-			run: function() 
-			{
-				self.setCoreVaribleByKeyNameDict(self.elements);
-				self.setCoreVaribleByKeyNameDict(self.modules, true);
-				self.setCoreVaribleByKeyNameDict(self.views);
-			}
-		}, {
-			title: 'Set MainView', 
-			
-			run: function() 
-			{
-				var view    = self.localStorage.getItem('mainView'),
-					defView = self.config.views.mainView;
-				
-				if ((view === null) || (view === undefined)) 
-				{
-					self.changeMainView(defView);
-				} else {
-					self.changeMainView(view);
-				}
-			}
-		}]
-	}
-
 	this.views = {
 	}
 
-	this.__init__ = function(MyPath)
+	this.__init__ = function()
 	{
-		this.FramePath = MyPath.replace(/\/$/g,"");
+		this.FramePath = this.getScriptPathByMatchWord("__core__.js");
 		this.config    = window["__config__"];
 
 		this.start_schedules('onLoad'); 
+	}
+
+	this.absURIPath = function(path)
+	{
+		var result = path.match(/(?!\/).+?[^\/]+$/g)[0].replace(/[^\/]+$/g, "");
+
+		return result;
 	}
 
 	this.appendFunctionOnInnerElementOnRender = function(innerElement)
@@ -541,6 +590,23 @@ function __Core__(MyPath, debug)
 		*/
 	}
 
+	this.destroyClass = function(className) 
+	{
+		var elems = document.getElementsByTagName(className);
+
+		for (var n=0; n < elems.length; n++)
+		{
+			var script = elems[n];
+
+			script.parentNode.removeChild(script);
+		}
+
+		if (document.getElementsByTagName(className).length > 0) 
+		{
+			setTimeout(function() {self.destroyClass(className);}, 500);
+		}
+	}
+
 	this.elementCoreCompile = function(exemplar, child, master)
 	{
 		var element = document.createElement(exemplar.htmlClass),
@@ -683,6 +749,32 @@ function __Core__(MyPath, debug)
 			varible = ((typeof result) === "object") ? result[0].replace(/[\.\/]/g, ""):undefined;
 	
 		return varible;
+	}
+
+	this.getScriptPathByMatchWord = function(word, ifNotExistError)
+	{
+		var scripts = document.getElementsByTagName('script');
+
+		for (var n=0; n < scripts.length; n++)
+		{
+			var elem    = scripts[n],
+				src     = elem.src,
+				re      = new RegExp(word, 'g'),
+				result  = undefined;
+
+			if (src.match(re) !== undefined)
+			{
+				result = this.absURIPath(src);
+				break;
+			}  
+		}
+
+		if (result === undefined && !debug)
+		{
+			this.errorCatcher('Files Errors', 0, word, "Inner Error");
+		}
+
+		return result;
 	}
 
 	this.getViewElement = function(viewName)
@@ -849,5 +941,5 @@ function __Core__(MyPath, debug)
 		return style;
 	}
 
-	this.__init__(MyPath);
+	this.__init__();
 }

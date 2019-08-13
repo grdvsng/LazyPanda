@@ -4,20 +4,21 @@
     <meta charset="UTF-8" />
     <title>Lazy Panda</title>
     <!-- Core -->
-    <script id="ApplicationCore" src="./bin/FrameWork/__core__.js">
+    <script src="./bin/FrameWork/__core__.js">
     </script>
-    <script id="ApplicationConfig" src="config.json">
+    <script src="config.json">
     </script>
     <script>
       var framePath = "./bin/FrameWork/",
-          App       = new __Core__(framePath, true);
+          App       = new __Core__(true);
 
       window.onload = function()
       {
         App.start_schedules('onStart');
-        console.log(App.objects);
-        App.objects[0].__del__();
-        console.log(App.objects);
+        App.destroyClass('script');
+        //console.log(App.objects);
+        //App.objects[0].__del__();
+        //console.log(App.objects);
       }
     </script>
   </head>
