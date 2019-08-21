@@ -1,4 +1,4 @@
-var __config__ = 
+__config__ = 
 {
 	"style":  "{FramePath}/bin/styles/default_style.js",
 

@@ -14,11 +14,12 @@ var index_view_main = {
 	
 	items: [{
 		type:     "innerElement",
-		class:    "FlexMenu",
-		position: 'top',
-
-		'auto-position': true,
-		
+		class:    "MenuPanel",
+		position: 1,
+		scroller: true,
+		effects: [
+			'hide panel button'
+		],
 		items: [{
 			type:    "innerElement",
 			class:   "MenuButton",
@@ -26,11 +27,11 @@ var index_view_main = {
 		}, {
 			type:    "innerElement",
 			class:   "MenuButton",
-			content: "О Компании"
+			content: "Контакты"
 		}, {
 			type:    "innerElement",
 			class:   "MenuButton",
-			content: "Контакты"
+			content: "Войти"
 		}]
 	}]
 };

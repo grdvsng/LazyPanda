@@ -1,55 +1,61 @@
-var default_style = {
+var colors = [
+	'White',
+	'#1F4E6B',
+	'#1F4E7B',
+	'Black'
+	],
 	
+	fonts = [
+		'Verdana'
+	];
+
+var default_style = {
+
 	universal: 
 	{
 		'DefaultView': 
 		{
-			'back-ground':
-			{
-				type:  'color',
-				value: 'rgb(242, 243, 243)'
-			}
+			'background': 'url({FramePath}/bin/styles/shaders/default.svg) no-repeat bottom center fixed',
 		},
 
 		'FlexMenu':
 		{
-			'background-color': 'White',
+			'background-color': colors[0],
 			'border-radius':    '15px',
 			'border-style':     'solid',
-			'border-color':     '#2F4F4F',
-			color:              'Black',
+			'border-color':     colors[1],
+			color:              colors[2],
 			position:           'absolute',
 			'vertical-align':   'middle',
 
 			'inner line': {
 				'border-radius':    '15px',
-				'background-color': '#2F4F4F'
+				'background-color': colors[1]
 			},
 
 			label: {
-				color: '#2F4F4F'
+				color: colors[1]
 			}
 		},
 
 		'MenuButton':
 		{
+			'font-family':      fonts[0],
 			'background-color': 'inherit',
-			position:           'relative',
-			border:         	'none',
-			color:         	    'white',
-			outline:        	'none'
+			'position':         'relative',
+			'border':         	'none',
+			'text-align':       'left',
+			'color':         	'inherit',
+			'outline':        	'none'
 		},
 
 		'MenuPanel':
 		{
-			heigth:             '10%',
 			'padding':          '1%',
-			'background-color': '#2F4F4F',
-			left:               '0.5%',
-			right:              '0.5%',
-			'border-radius':    '5px',
-			color:              'black',
-			position:           'absolute'
+			'border-color':     colors[1],
+			'background-color': colors[1],
+			'color':            colors[0],
+			'position':         'absolute'
 		}
 	},
 
@@ -57,16 +63,11 @@ var default_style = {
 	{
 		'DefaultView': 
 		{
-			'back-ground': 
-			{
-				type:  'color',
-				value: '#133CAC'
-			}
 		},
 
 		'FlexMenu':
 		{
-			padding:            '5px',
+			'padding':          '5px',
 			'padding-bottom':   '1px',
 			'font-weight':      '800',
 			'width':            '900px',
@@ -75,16 +76,14 @@ var default_style = {
 
 		'MenuButton':
 		{
-			width:           	'20%',
+			'width':           	'20%',
 			'font-size':        '14pt',
 			'font-weight':      '700',
 		},
 
 		'MenuPanel':
 		{
-			heigth:             '10%',
-			width:              '98%',
-			border:             '2px solid white'
+			'border':           '2px solid ' + colors[0]
 		}
 	},
 
@@ -97,12 +96,14 @@ var default_style = {
 		'FlexMenu':
 		{
 			'border-width':     '2px',
-			padding:            '2px',
+			'padding':          '2px',
 			'padding-top':      '0px',
 			'font-weight':      '800',
+			'width':            '50px',
 
 			'inner line': {
-				'width':      '40px',
+				'left':       '2%',
+				'right':      '2%',
 				'height':     '4px',
 				'margin-top': '5px'
 			},
@@ -115,15 +116,14 @@ var default_style = {
 
 		'MenuButton':
 		{
-			width:           	'20%',
-			'font-weight':      '700',
-			'font-size':        '14pt',
-			'font-weight':      '700'
+			'font-size':       '14pt',
+			'font-weight':     700
 		},
 
 		'MenuPanel':
 		{
-			border: '2px solid white'
+			'border':          '2px solid ' + colors[0],
+			'box-shadow': 	   'inset 1px 1px 1px 1px ' + colors[2],
 		}
 	}
 }

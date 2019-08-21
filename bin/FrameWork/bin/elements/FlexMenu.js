@@ -8,12 +8,27 @@ var FlexMenu = function(core, child, master)
 	this.defaultLabel = {position: 'left'};
 	this.domElement   = null;
 	this.htmlClass    = (child.htmlClass === undefined) ? "table":child.htmlClass;
+	this.position     = (child.position  === undefined) ? 0:child.position;
 	this.type         = "innerElement";
 	this.style        = than.style.parameters[this.class];
 
+	this.positions = [{
+			left:   '2%',
+			top:    '2%'
+		}, {
+			left:   '2%',
+			bottom: '2%'	
+		}, {
+			right:  '2%',
+			top:    '2%'	
+		}, {
+			right:  '2%',
+			bottom: '2%'	
+	}]
+
 	this.effects = [
-		'pursuit of scroll',
-		'click effect 1'
+		'scroller',
+		'flip_1'
 	]
 
     this.innerItems     = [{
@@ -35,19 +50,29 @@ var FlexMenu = function(core, child, master)
 		}]
     }]
 	
+	this.changePos = function(positionNumber)
+	{
+		var pos = self.positions[positionNumber];
+
+		than.objectAddition(self.domElement.style, pos);
+	}
+
 	this.onRender = function()
 	{
 		var rect = self.domElement.getBoundingClientRect();
 
 		self.domElement.style.height = (self.label) ? ((rect.height * 1.3) + 'px'):(rect.width + 'px');
+		
+		self.changePos(self.position);
 	}
 	
 	this.compile = function(child, master)
 	{
-		self.items  = child.items;
-		child.items = this.innerItems;
+		self.items   = child.items;
+		child.items  = this.innerItems;
+		scroller     = (child['scroller'] !== undefined) ? child['scroller']:false;
 
-		if (!child['auto-position']) this.effects.splice(0, 1);
+		if (!scroller) this.effects.splice(0, 1);
 	}
 
 	this.compile(child, master);

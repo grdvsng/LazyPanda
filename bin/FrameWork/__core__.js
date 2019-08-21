@@ -1,89 +1,86 @@
-/*  Class __Core__(debug).
-	
-	Описание: 
-		Ядро фреймворка.
-	
-	Параметр(ы):
-		______________________________________________________________________
-		 ---- Наименование ---- | -------- Тип ------- | ----- Описание -----
-		________________________|______________________|______________________
-		 debug 			        | Boolean              | Режим отладки, если true выключаем внутренний обработчик ошибок.
-		________________________|______________________|______________________
-	
-	Атрибут(ы): 
-		______________________________________________________________________
-		 ---- Наименование ---- | -------- Тип ------- | ----- Описание -----
-		________________________|______________________|______________________
-		elements 				| Object               | Словарь генирующийся при подключении елементов к приложению, содержит ссылки на конструктор элементов;
-		elementsDefaultFunction | Object               | Словарь с стандартными для всех элементов функциями, которые подключаются к элементу при генерации;
-		innerErrors             | Object               | Словарь с внутренними ошибками приложения.
-		localStorage            | Object               | Объект для работы с localStorage (если поддерживается браузером);
-		mainView                | Object               | Объект главного представления приложения (аналог BODY);
-		modules                 | Object               | Словарь генирующийся при подключении модулей к приложению, содержит ссылки на конструктор модулей.
-		objects                 | Array                | Список всех подключенных елементов в приложении;
-		shedules                | Object               | Словарь с задачами для приложения.
-		style                   | Object               | Основной стиль приложения, задается в файле конфигурации;
-		UI_effects              | Object               | Словарь с объектами стандартных графических эффетов; 
-		views                   | Object               | Словарь генирующийся при подключении представлений к приложению, содержит ссылки на конструктор представлений.
-		________________________|______________________|______________________
-
-	Метод(ы):
-		___________________________________________________________________________________
-		 ---------- Наименование ----------- | -------- Тип ------- | ----- Описание -----
-		_____________________________________|______________________|______________________
-		__init__ 							 | Object               | Словарь генирующийся при подключении елементов к приложению, содержит ссылки на конструктор элементов;
-		absURIPath                           | Object               | Словарь с стандартными для всех элементов функциями, которые подключаются к элементу при генерации;
-		appendFunctionOnInnerElementOnRender | Object               | Словарь с внутренними ошибками приложения.
-		appendMethodOrElemKey           	 | Object               | Объект для работы с localStorage (если поддерживается браузером);
-		arrayAddition              		     | Object               | Объект главного представления приложения (аналог BODY);
-		connect                 			 | Object               | Словарь генирующийся при подключении модулей к приложению, содержит ссылки на конструктор модулей.
-		compileTextLabel                	 | Array                | Список всех подключенных елементов в приложении;
-		connectInnerAttsToHTMLObject         | Object               | Словарь с задачами для приложения.
-		compileElement                  	 | Object               | Основной стиль приложения, задается в файле конфигурации;
-		compileElements                      | Object               | Словарь с стандартными для всех элементов функциями, которые подключаются к элементу при генерации;
-		compileEffectsToElement              | Object               | Словарь с объектами стандартных графических эффетов; 
-		compileHTMLElement                   | Object               | Словарь генирующийся при подключении представлений к приложению, содержит ссылки на конструктор представлений.
-		compileInnerElement 				 | Object               | Словарь генирующийся при подключении елементов к приложению, содержит ссылки на конструктор элементов;
-		changeMainView 						 | Object               | Словарь с внутренними ошибками приложения.
-		changeHTMLElementTag           	 	 | Object               | Объект для работы с localStorage (если поддерживается браузером);
-		createHideMirrorHTMLElement          | Object               | Объект главного представления приложения (аналог BODY);
-		cloneObject                 		 | Object               | Словарь генирующийся при подключении модулей к приложению, содержит ссылки на конструктор модулей.
-		destView                			 | Array                | Список всех подключенных елементов в приложении;
-		destroyClass        				 | Object               | Словарь с задачами для приложения.
-		elementCoreCompile                   | Object               | Основной стиль приложения, задается в файле конфигурации;
-		elementStyleCompile             	 | Object               | Словарь с объектами стандартных графических эффетов; 
-		errorCatcher                         | Object               | Словарь генирующийся при подключении представлений к приложению, содержит ссылки на конструктор представлений.
-		format 							     | Object               | Словарь генирующийся при подключении елементов к приложению, содержит ссылки на конструктор элементов;
-		foundKey                             | Object               | Словарь с стандартными для всех элементов функциями, которые подключаются к элементу при генерации;
-		generateDictWithIdAndClassAttributs  | Object               | Словарь с внутренними ошибками приложения.
-		getAndCallMainFunctionFromElemPath   | Object               | Объект для работы с localStorage (если поддерживается браузером);
-		getMaster              		     	 | Object               | Объект главного представления приложения (аналог BODY);
-		getMethodVaribleByPath               | Object               | Словарь генирующийся при подключении модулей к приложению, содержит ссылки на конструктор модулей.
-		getScriptPathByMatchWord             | Array                | Список всех подключенных елементов в приложении;
-		getViewElement         				 | Object               | Словарь с задачами для приложения.
-		globalStartConnector                 | Object               | Основной стиль приложения, задается в файле конфигурации;
-		objectAddition                       | Object               | Словарь с стандартными для всех элементов функциями, которые подключаются к элементу при генерации;
-		replaceKeyInStringByCoreVariable     | Object               | Словарь с объектами стандартных графических эффетов; 
-		scrollTop                            | Object               | Словарь генирующийся при подключении представлений к приложению, содержит ссылки на конструктор представлений.
-		setBackground 				 		 | Object               | Словарь генирующийся при подключении елементов к приложению, содержит ссылки на конструктор элементов;
-		setBackgroundWalpers 			     | Object               | Словарь с внутренними ошибками приложения.
-		setBackgroundColor           	 	 | Object               | Объект для работы с localStorage (если поддерживается браузером);
-		setCoreVaribleByKeyNameDict          | Object               | Объект главного представления приложения (аналог BODY);
-		start_schedules                      | Object               | Словарь генирующийся при подключении модулей к приложению, содержит ссылки на конструктор модулей.
-		destView                			 | Array                | Список всех подключенных елементов в приложении;
-		_____________________________________|______________________|______________________
-
-	* Более подробное описание объектов и метов задокументированно в коде.
-
-*/
-function __Core__(debug)
+function OOP(self)
 {
-	var self  = this,					
-		debug = (debug !== undefined); 
-
-	this.elements = {
+	this.__init__ = function()
+	{
+		//...
 	}
 
+	this.inheritance = function(parents)
+	{
+		var dict = [];
+
+		for (var n=0; n < parents.length; n++)
+		{
+			var parent = new parents[n]();
+			
+			dict[parent.name] = parent;
+			parent.child      = self;
+			
+			for (var att in parent) self[att] = parent[att];
+		}
+
+		return dict;
+	}
+
+	this.__init__();
+}
+
+
+function __LocalStorage__()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+			ErrorsCatcher
+		];
+
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
+	}
+
+	this.LocalStorageOnError = function(e)
+	{
+		self.errorCatcher('Browser Error', 0, null, e);
+	}
+
+	this.getLocalStorageItem = function(key)
+	{
+		var result;
+		
+		try {
+			result = localStorage.getItem(key);
+		} catch(e) {
+			result = undefined;
+			this.LocalStorageOnError(e);
+		}
+
+		return undefined;
+	}
+
+	this.setItem = function(key, data)
+	{
+		try {
+			localStorage.setItem(key, data);
+		} catch(e) {
+			this.onError(e);
+		}
+	}
+
+	this.__init__();
+}
+
+
+function Element()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+			Сompiler,
+			HTMLElement
+		];
+	
+	// Уневерсальные функция для всех элементов.
 	this.elementsDefaultFunction = {
 		
 		__del__: function()
@@ -99,6 +96,13 @@ function __Core__(debug)
 		changeHTMLElementTag: function(newTag)
 		{
 			self.changeHTMLElementTag(this, newTag);
+		},
+		
+		connectEffect: function(effectName)
+		{
+			var effect = self.UI_effects[effectName];
+			
+			return effect.compile(this);
 		},
 
 		removeChildren: function()
@@ -122,6 +126,47 @@ function __Core__(debug)
 			this.domElement.style.height = x;
 		},
 
+		resizeChild: function(child, x, y)
+		{
+			try {
+				child.super.resize(x, y);
+			} catch(e) {
+				child.style.width  = y;
+				child.style.height = x;
+			}
+		},
+
+		makeLineBetweenChildNodes: function()
+		{
+			var childs = this.core.cloneArray(this.domElement.childNodes),
+				self   = (self !== undefined) ? self:this;
+
+			for (var n=0; n < childs.length; n++)
+			{
+				var child  = childs[n],
+					line   = {
+						type:      "HTMLCollection",
+						htmlClass: "br",
+					};
+
+				if (n !== 0) 
+				{
+					var elem = child.super.core.compileElement(line, self);		
+					self.domElement.insertBefore(elem.domElement, child);
+				}
+			}
+		},
+
+		makeInnerWidthForChildNodes: function(width)
+		{
+			var maxWidth = 0;
+
+			for (var n=0; n < this.domElement.childNodes.length; n++) 
+			{
+				this.resizeChild(this.domElement.childNodes[n], "", (width) + 'px');
+			}
+		},
+
 		setColorFilter: function(type, precent, byString)
 		{
 			var byString = (precent === undefined && byString === undefined) ? type:byString;
@@ -130,13 +175,282 @@ function __Core__(debug)
 			if (byString !== undefined) this.domElement.style.filter = byString;
 		},
 
+		getChildNodesMaxWidth: function()
+		{
+			var maxWidth = 0;
+
+			for (var n=0; n < this.domElement.childNodes.length; n++) 
+			{
+				var child = this.domElement.childNodes[n],
+					rect  = child.getBoundingClientRect(); 
+				maxWidth  = (rect.width > maxWidth) ? rect.width:maxWidth;
+			}
+
+			return maxWidth;
+		},
+
 		getElement: function()
 		{
 			return this.domElement;
+		},
+		
+		getSize: function(onPX)
+		{
+			var onPX = (onPX !== undefined) ? onPX:false,
+				rect = this.domElement.getBoundingClientRect(),
+				x    = (onPX) ? rect.height + 'px':rect.height,
+				y    = (onPX) ? rect.width  + 'px':rect.width;
+
+			return {
+				height: x, 
+				width:  y
+			};
+		},
+		
+		getSizeAttribute: function(att, onPX)
+		{
+			var onPX = (onPX !== undefined) ? onPX:false,
+				cur  = this.domElement.getBoundingClientRect()[att];
+
+			if (onPX) cur += 'px';
+
+			return cur;
+		},
+
+		getHeight: function(onPX)
+		{
+			return this.getSizeAttribute('height', onPX);
+		},
+
+		getWidth: function(onPX)
+		{
+			return this.getSizeAttribute('width', onPX);
+		},
+
+		hide: function()
+		{
+			this.domElement.display       = this.domElement.style.display;
+			this.domElement.style.display = 'none';
+		},
+
+		show: function()
+		{
+			this.domElement.style.display = (this.domElement.display  !== undefined) ? this.domElement.display:'block';
 		}
 	}
 
-	this.innerErrors = {
+	// Различные графические эффекты для элементов.
+	this.UI_effects = {
+		'scroller':
+		{
+			event: 'scroll',
+
+			compile: function(elem)
+			{
+				document.addEventListener(this.event, function()
+				{
+					elem.domElement.style.top = elem.core.scrollTop();
+				});
+			}
+		},
+
+		'flip_1':
+		{
+			event: 'click',
+
+			compile: function(elem)
+			{
+				var def = function()
+				{
+					var size = elem.getSize(),
+						nowX = size.height          + 'px',
+						nowY = size.width           + 'px',
+						newX = (size.height * 0.95) + 'px',
+						newY = (size.width  * 0.95) + 'px';
+					
+					elem.resize(newX, newY);
+					setTimeout(function()
+					{
+						elem.resize(nowX, nowY);
+					}, 100);
+				};
+
+				elem.domElement.addEventListener(this.event, self.effectCompiller(this.event, def));
+			}
+		},
+
+		'flip_2':
+		{
+			event: 'click',
+
+			compile: function(elem)
+			{
+				var def = function()
+				{
+					var style = window.getComputedStyle(elem.domElement, null),
+				    oldSize = Number(style['font-size'].replace('px', ""));
+					
+					elem.domElement.style['font-size'] = (oldSize - 1) + 'px';
+
+					setTimeout(function()
+					{
+						elem.domElement.style['font-size'] = oldSize + 'px';
+					}, 100);
+				};
+
+				elem.domElement.addEventListener(this.event, self.effectCompiller(this.event, def));
+			}
+		},
+
+		'focus_1': 
+		{
+			event1: 'mouseout',
+			event2: 'mouseover',
+
+			compile: function(elem)
+			{	
+				var filer = (elem.domElement.style['filer'] !== undefined) ? elem.domElement.style['filer']:'none',
+					def1     = function()
+					{
+						elem.domElement.style['filter'] = "opacity(0.7)";
+					},
+					def2     = function()
+					{
+						elem.domElement.style['filter'] = filer;
+					};
+			
+				elem.domElement.addEventListener(this.event2, self.effectCompiller(this.event2, def1));
+				elem.domElement.addEventListener(this.event1, self.effectCompiller(this.event1, def2));
+			}
+		},
+
+		'hide panel button': 
+		{
+			event: 'click',
+
+			compile: function(elem)
+			{	
+				var filer = (elem.domElement.style['filer'] !== undefined) ? elem.domElement.style['filer']:'none',
+					def   = function()
+					{
+						console.log();
+					};
+				
+				var style  =  window.getComputedStyle(elem.domElement),
+					params = 
+					{
+						type:    "innerElement",
+						class:   "MenuButton",
+						content: "❱",
+						style: 
+						{
+							position: 'absolute',
+							right:    '0%',
+							bottom:   '0%',
+							color:    style['color']
+						}
+					},
+					button = elem.core.compileElement(params, elem);
+
+				button.domElement.addEventListener(this.event, function(e){console.log(e)});
+			}
+		}
+	}
+
+	
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
+	}
+
+	this.clone = function(element)
+	{
+		this.changeHTMLElementTag(element, element.domElement.tagName, true);
+	}
+
+ 	this.changeHTMLElementTag = function(element, newTag, notRemove)
+	{
+		element.compile_parameters.htmlClass = newTag;
+
+		var elem = this.compileElement(element.compile_parameters, element.master);
+
+		if (notRemove === undefined) element.__del__();
+
+		return elem;
+	}
+
+	this.effectCompiller = function(event, func)
+	{
+		return function()
+		{
+			this['isOn' + event] = (this['isOn' + event] !== undefined) ?  this['isOn' + event]:false;
+
+			if (!this['isOn' + event]) 
+			{
+				this['isOn' + event] = true;
+				
+				func();
+				
+				this['isOn' + event] = false;
+			}
+		}
+	}
+
+	this.getAndCallMainFunctionFromElemPath = function(path)
+	{
+		var cleanName = path.replace(/(?!\/).*?(?=\/)|\//g, "").split('.')[0];
+		
+		return window[cleanName];
+	}
+
+	// Добавление задания для выполнения после рендера элемента.
+	this.appendFunctionOnInnerElementOnRender = function(innerElement)
+	{
+		var compileParams = innerElement.compile_parameters,
+			oldRender     = innerElement.onRender;
+
+		innerElement.onRender = function()
+		{
+			if (oldRender) oldRender();
+			
+			self.compileEffectsToElement(innerElement);
+		}
+	}
+
+	this.getMaster = function(master)
+	{
+		if ((master !== undefined) && (master !== null))
+		{
+
+			if ((master.domElement !== undefined) && (master.domElement !== null)) 
+			{
+				return master.domElement;
+			}
+			else if ((master.id !== undefined) && (master.id !== null))
+			{
+				return document.getElementById(master.id);
+			}
+		}
+	}
+
+	this.__init__();
+}
+
+
+function ErrorsCatcher()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+		];
+	
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
+	}
+
+	// Внутренние ошибки.
+	this.errors = {
 		'View Error': [{
 			type:    "error",
 			message: "Can't compile view: '{0}', check your views."
@@ -191,47 +505,655 @@ function __Core__(debug)
 		}]
 	}
 
-	this.localStorage = {
-		onError: function(e)
-		{
-			self.errorCatcher('Browser Error', 0, null, e);
-		},
+	this.errorCatcher = function(errorType, errorNumber, args, browseError)
+	{
+		var error      = this.errors[errorType][errorNumber],
+			body       = this.format(error.message, args),
+			line       = "-".repeat(body.length),
+			shablone   = "{title}\n{line}\n{body}\n{line}\nBrowser Error:\n{ge}\n{line}\n\n",
+			curMessage = this.format(shablone, {'title': errorType, 'line': line, 'body': body, 'ge': browseError});
 
-		getItem: function(key)
+		if (error.type === 'warning') 
 		{
-			var result;
-			
-			try {
-				result = localStorage.getItem(key);
-			} catch(e) {
-				result = undefined;
-				this.onError(e);
-			}
-
-			return undefined;
-		},
-
-		setItem: function(key, data)
-		{
-			try {
-				localStorage.setItem(key, data);
-			} catch(e) {
-				this.onError(e);
-			}
+			console.log(curMessage);
+		} else {
+			throw curMessage;
 		}
 	}
 
-	this.mainView = {
-		title: null,
-		data: null
+	this.format = function(str, args)
+	{
+		var toFormat   = ((typeof args) !== "string") ? args:[args],
+			curentLine = str;
+
+		for (var n in toFormat)
+		{
+			var key = "\\{" + n + "\\}";
+			curentLine = curentLine.replace(new RegExp(key, 'g'), toFormat[n]);
+		}
+
+		return curentLine;
 	}
 
-	this.modules = {
+	this.__init__();
+}
+
+
+function Сompiler()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+			Obj,
+			Formatting
+		];
+
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
 	}
 
-	this.objects = [
-	]
 
+	this.elementCoreCompile = function(exemplar, child, master)
+	{
+		var element = document.createElement(exemplar.htmlClass),
+			master  = this.getMaster(master);
+		
+		child.style      = this.elementStyleCompile(exemplar.style, child.style);
+		child.domElement = element;
+		child            = this.objectAddition(exemplar, child);
+
+		this.connectInnerAttsToHTMLObject(exemplar, element, child);
+		master.appendChild(element);
+
+		return exemplar; 
+	}
+
+	this.elementStyleCompile = function(elem, params)
+	{
+		for (var key in params)
+		{
+			var val = params[key]
+				att = elem[key];
+			
+			if ((typeof val) === 'object' && (typeof att) === 'object') 
+			{
+				elem[key] = this.objectAddition(att, val);
+			}
+			else if ((typeof val) === 'string')
+			{
+				elem[key] = self.replaceKeyInStringByExemplarVariable(val);
+			} else {
+				elem[key] = val;
+			}
+
+		}
+
+		return elem;
+	}
+
+	this.generateID = function(element, replace)
+	{
+		var replace = !(replace !== undefined),
+			old_ID  = element.domElement.id,
+			new_ID  = element.domElement.className + "_" + document.getElementsByClassName(element.domElement.className).length;
+		
+		if (!replace && old_ID !== undefined && old_ID !== null) new_ID = old_ID;
+		
+		return new_ID;
+	}
+
+	this.globalStartConnector = function(listOfElems, elemsType, elemsMaster, paramType)
+	{	
+		for (var n in listOfElems)
+		{
+			var elem   = document.createElement(elemsType),
+				val    = listOfElems[n],
+				params = {},
+				attKey = this.getMethodVaribleByPath(val);
+
+			if (attKey !== undefined) this.appendMethodOrElemKey(val, attKey);
+			params[paramType] = this.replaceKeyInStringByExemplarVariable(val);
+			
+			this.connect(elem, elemsMaster, params);
+		}
+	}
+
+	this.compileTextLabel = function(el, label)
+	{
+		var domElement = el.domElement,
+			elemType   = (label.position !== 'top' && label.position !== 'bottom') ? 'td':'tr',
+			elem       = document.createElement(elemType);
+		
+		label.style      = this.objectAddition(el.style.label, label.style);
+		label.content    = label.content;
+		label.domElement = this.connectInnerAttsToHTMLObject(label, elem, el);
+		
+		if (label.position === 'left' || label.position === 'top')   
+		{
+			domElement.insertBefore(label.domElement, domElement.firstChild);
+		} else {
+		    domElement.appendChild(label.domElement);
+		}
+
+		return label;
+	}
+
+	this.connectInnerAttsToHTMLObject = function(innerElement, HTMLElement, paramsForElement)
+	{
+		HTMLElement.innerHTML += (innerElement.content !== undefined) ? "<div>" + innerElement.content.trim() +  "</div>":"";
+		
+		this.elementStyleCompile(HTMLElement.style, innerElement.style);
+		this.objectAddition(HTMLElement, innerElement.events);
+		this.generateDictWithIdAndClassAttributs(innerElement, HTMLElement);
+
+		return HTMLElement;
+	}
+	
+	this.afterCompile   = function(el, compiled)
+	{
+		compiled.core             = this;
+		compiled.domElement.super = compiled;
+		
+		this.objectAddition(compiled, this.elementsDefaultFunction);
+
+		if (compiled.effects) 
+		{
+		    this.appendFunctionOnInnerElementOnRender(compiled);     
+		}
+        
+		if (compiled.onRender !== undefined) compiled.onRender();
+		if (el.label)                        compiled.label = this.compileTextLabel(compiled, el.label);	
+
+		compiled.master.children.push(compiled);
+		this.objects.push(compiled);
+	}
+
+	this.compileElement = function(el, master)
+	{
+		var type  = el.type
+			elem  = undefined;
+		
+		el.compile_parameters = this.cloneObject(el);
+		master                = el.master = (el.master !== undefined) ? el.master:master;
+		master.children       = (master.children !== undefined) ? master.children:[];
+		
+		this.objectAddition(elem, this.elementsDefaultFunction);
+		
+		if (type === "HTMLCollection")   elem = this.compileHTMLElement(el, master);
+		if (type === "innerElement")     elem = this.compileInnerElement(el, master);		
+		
+		this.afterCompile(el, elem);
+
+		return elem;
+	}
+
+	this.compileElements = function(items, master)
+	{
+		for (var n in items)
+		{
+			var elem  = items[n];
+
+			items[n] = this.compileElement(elem, master);
+		}
+	}
+
+	this.compileEffectsToElement = function(element)
+	{
+		var effects = element.effects;
+
+		for (var n=0; n < effects.length; n++)
+		{
+			var name = effects[n];
+
+		   element.connectEffect(name);
+		}
+	}
+
+	this.compileHTMLElement = function(el, master)
+	{
+		var element = document.createElement(el.htmlClass),
+			master  = (master.domElement === undefined) ? master:master.domElement,
+			items   = el.items;
+		
+		this.connectInnerAttsToHTMLObject(el, element);
+		
+		el.compile_parameters = el;
+		el.domElement         = element;
+
+		if (items) this.compileElements(items, el);
+
+		master.appendChild(element);
+
+		return el;
+	}
+
+	this.compileInnerElement = function(element, master)
+	{
+		var compiler = this.elements[element.class],
+			master   = (element.master !== undefined) ? element.master:master,
+			exemplar = new compiler(this, element, master),
+			compiled = this.elementCoreCompile(exemplar, element, master),
+			items    = compiled.items;
+
+		if (items) this.compileElements(items, element);
+		
+		return compiled;
+	}
+
+	this.__init__();
+}
+
+
+function Formatting()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+			ErrorsCatcher
+		];
+	
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
+	}
+
+	// Аналог Python format.
+	this.format = function(str, args)
+	{
+		var toFormat   = ((typeof args) !== "string") ? args:[args],
+			curentLine = str;
+
+		for (var n in toFormat)
+		{
+			var key = "\\{" + n + "\\}";
+			curentLine = curentLine.replace(new RegExp(key, 'g'), toFormat[n]);
+		}
+
+		return curentLine;
+	}
+	
+	// Замена ключей в строке на значение переменных движка.
+	this.replaceKeyInStringByExemplarVariable = function(str)
+	{
+		var list = str.match(/\{{1,1}(.+?)\}{1,1}/g),
+			args = {};
+
+		if (list !== undefined && list !== null)
+		{
+			for (var n=0; n < list.length; n++)
+			{
+				var key = list[n].replace(/[\{\}]/g, ""),
+					val = (this[key] !== undefined) ? this[key]:window[key];
+
+				if (val === undefined || val === null) 
+				{
+					this.errorCatcher('Replace Key In String By Core Variable', 0, key, "Inner Error");
+				} else {
+					args[key] = val;
+				}
+			}
+		}
+
+		return this.format(str, args);
+	}
+
+	this.__init__();
+}
+
+
+function HTMLElement()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+			PathParser
+	];
+	
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
+	}
+
+	this.connect = function(what, to, attributes)
+	{
+		for (var key in attributes)
+		{
+			var data = attributes[key];
+
+			what.setAttribute(key, data);
+		}
+
+		to.appendChild(what);
+	}
+
+ 	this.createHideMirrorHTMLElement = function(element)
+ 	{
+ 		var elem  = (element.domElement !== undefined) ? element.domElement:element,
+ 			rect  = elem.getBoundingClientRect(),
+ 			clone = {
+ 				domElement: document.createElement('div'),
+ 				master:     element,
+
+ 				style: 
+ 				{
+	 				position: element.domElement.position,
+	 				width:    rect.width  + 'px',
+	 				height:   rect.height + 'px'
+ 				}
+ 			};
+ 		
+		clone.domElement.super     =  clone;
+		clone.domElement.className = 'Hide_Mirror_Elements';
+
+ 		this.objectAddition(clone.domElement.style, clone.style);
+ 		
+ 		return clone;
+ 	}
+
+	this.getScriptPathByMatchWord = function(word, ifNotExistError)
+	{
+		var scripts = document.getElementsByTagName('script');
+
+		for (var n=0; n < scripts.length; n++)
+		{
+			var elem    = scripts[n],
+				src     = elem.src,
+				re      = new RegExp(word, 'g'),
+				result  = undefined;
+
+			if (src.match(re) !== undefined)
+			{
+				result = this.absURIPath(src);
+				break;
+			}  
+		}
+
+		if (result === undefined && !debug)
+		{
+			this.errorCatcher('Files Errors', 0, word, "Inner Error");
+		}
+
+		return result;
+	}
+
+	this.__init__();
+}
+
+
+function Obj()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+	];
+	
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
+	}
+
+	// Слияние списков
+ 	this.arrayAddition = function(arr1, arr2)
+ 	{
+ 		var loop = (loop !== undefined) ? loop:false,
+ 			arr1 = (arr1 !== undefined) ? arr1:[],
+ 			arr2 = (arr2 !== undefined) ? arr2:[];
+
+		if (arr1.length > arr2.length)
+		{
+			var temp = this.cloneArray(arr1);
+
+			arr1 = this.cloneArray(arr2);
+			arr2 = temp;
+		}
+
+ 		for (var n=0; n < arr2.length; n++)
+ 		{
+ 			var val = arr2[n];
+
+ 			arr1.push(val);
+ 		}
+
+ 		return arr1;
+ 	}
+
+ 	// Слияние объектов.
+ 	this.objectAddition = function(mainObject, addObject, specialParser)
+	{
+		var specialParser = (specialParser !== undefined) ? specialParser:false,
+			currentObject = (mainObject !== undefined)    ? mainObject:{},
+			addObject     = (addObject !== undefined)     ? addObject:{};
+
+		for (var att in addObject)
+		{
+			var val = addObject[att];
+
+			currentObject[att] = (specialParser) ? specialParser(val):val;
+		}
+		
+		return currentObject;
+	}
+	
+	this.cloneArray = function(arr)
+ 	{
+ 		return this.arrayAddition([], arr);
+ 	}
+
+	this.cloneObject = function(obj)
+ 	{
+ 		return this.objectAddition(obj, {});
+ 	}	
+
+ 	this.foundKey = function(obj, key, scopeLevel)
+	{
+		var found      = false,
+			scopeLevel = (scopeLevel !== undefined) ? 0:scopeLevel;
+
+		for (var att in obj)
+		{
+			var node = obj[key];
+
+			if (att === key) {
+				found = node;
+				break;
+			}
+		}
+
+		if (!found && scopeLevel !== 0)
+		{
+			for (var att in obj) this.foundKey(obj[att], key, scopeLevel - 1);
+		} else {
+			return found;
+		}
+	}
+
+	this.__init__();
+}
+
+
+function PathParser()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+	];
+	
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
+	}
+
+	// Возвращает абсолютный путь для внутренней ссылок.
+	this.absURIPath = function(path)
+	{
+		var result = path.match(/(?!\/).+?[^\/]+$/g)[0].replace(/[^\/]+$/g, "");
+
+		return result;
+	}
+
+	// Значение главной переменной модуля по его пути, только для данного движка.
+	this.getMethodVaribleByPath = function(val)
+	{
+		var result  = val.match(/\/{1,1}[^\/]+\.{1,1}/g),
+			varible = ((typeof result) === "object") ? result[0].replace(/[\.\/]/g, ""):undefined;
+	
+		return varible;
+	}
+
+	this.__init__();
+}
+
+
+function Sheduler()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+	];
+	
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
+	}
+
+	this.start_schedules = function(shedulesName)
+	{
+		var shedules = (this.shedules[shedulesName] !== undefined) ? this.shedules[shedulesName]:false;
+
+		if (!shedules) this.errorCatcher('Shedules Error', 0, shedulesName);
+
+		for (var n=0; n < shedules.length; n++)
+		{
+			var shedule = shedules[n];
+			shedule.run = (shedule.run !== undefined) ? shedule.run:shedule.compile(this, shedule.compileArgs);
+
+			shedule.run();	
+		}
+	}
+
+	this.__init__();
+}
+
+
+function View()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+			Сompiler
+	];
+	
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
+	}
+
+	this.changeMainView = function(view, toDestroy)
+	{
+		var view     = ((typeof view) === "object") ? view:this.getViewElement(view),
+			mainView = this.compileInnerElement(view);
+
+		if (toDestroy) this.destView(toDestroy);
+		
+		document.body.style.background         = mainView.style.background;
+		document.body.style['background-size'] = (mainView.style['background-size'] !== undefined) ? mainView.style['background-size']:'100%';
+	}
+	
+	this.destView = function(view)
+	{
+		console.log(view)
+		/*
+		var master = document.getElementById(view.master.id);
+
+		master.innerHtml = "";
+		*/
+	}
+
+	this.getViewElement = function(viewName)
+	{
+		var params = window[viewName];
+
+		if ((params === undefined) || (params === null))
+		{
+			this.errorCatcher('View Error', 1, viewName, "Inner Error");
+		} else {
+			params = params;
+		}
+
+		return params;
+	}
+
+	this.viewStyleCompile = function(styles, mode)
+	{
+		var style = styles[mode];
+
+		for (var elemName in styles.universal)
+		{
+			var params    = styles.universal[elemName],
+				elem      = style[elemName],
+				elemStyle = self.elementStyleCompile(elem, params);
+			
+			elem = elemStyle; 
+		}
+
+		return style;
+	}
+
+	this.setBackground = function(val)
+	{
+		self.domElement.style['background'] = this.replaceKeyInStringByExemplarVariable(val);
+	}
+
+	this.__init__();
+}
+
+
+function Win()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+	];
+	
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
+	}
+
+	this.scrollTop = function() 
+	{
+		var scrollY = (window.scrollY) ? window.scrollY:0,
+			rect    = document.body.getBoundingClientRect(),
+			result  = Math.max(scrollY, window.pageYOffset, rect.top);
+		
+		return result + 'px';
+	}
+
+	this.__init__();
+}
+
+
+function __Core__(debug)
+{
+	var self  	   = this,					
+		OOPMethods = new OOP(this),
+		debug 	   = (debug !== undefined) ? debug:false,
+		parents    = [
+			Element,
+			ErrorsCatcher,
+			Сompiler,
+			Formatting,
+			HTMLElement,
+			Obj,
+			PathParser,
+			Sheduler,
+			__LocalStorage__,
+			View,
+			Win
+		];
+	
+	// Задания.
 	this.shedules = {
 		onLoad: [{
 			title: 'Connect modules and elements', 
@@ -283,7 +1205,7 @@ function __Core__(debug)
 			
 			run: function() 
 			{
-				var view    = self.localStorage.getItem('mainView'),
+				var view    = self.getLocalStorageItem('mainView'),
 					defView = self.config.views.mainView;
 				
 				if ((view === null) || (view === undefined)) 
@@ -303,108 +1225,45 @@ function __Core__(debug)
 		}]
 	}
 
+	this.elements = {
+	}
+	
+	// Все подключенные объекты.
+	this.objects = [
+	]
+
+	// Главное представление страницы.
+	this.mainView = {
+		title: null,
+		data: null
+	}
+
+	// Подключенные модули подключаются в данный список.
+	this.modules = {
+	}
+
+	// Активный стиль, генерируется при запуске в зависимости от размера экрана.
 	this.style = {
 		title: null,
 		parameters: null
 	}
 
-	this.UI_effects = {
-		'pursuit of scroll':
-		{
-			event: 'scroll',
-
-			def: function(target)
-			{
-				return function()
-				{
-					target.style.top = self.scrollTop();
-				}
-			},
-
-			compile: function(innerElement)
-			{
-				var elem = innerElement.domElement,
-					func = this.def(elem);
-
-				document.addEventListener(this.event, func);
-			}
-		},
-
-		'click effect 1':
-		{
-			event: 'mousedown',
-
-			def: function (element)
-			{
-				return function(event)
-				{
-					var elem      = (this.super.domElement !== undefined) ? this.super.domElement:this.super,
-						rect      = elem.getBoundingClientRect(),
-						nowX      = rect.height,
-						nowY      = rect.width,
-						newX      = (nowX * 0.95) + 'px',
-						newY      = (nowY * 0.95) + 'px',
-						nowFilter = element.master.domElement.style.filter;
-
-					element.master.resize(newX, newY);
-					element.master.setColorFilter("grayscale", 40);
-
-					this.addEventListener('mouseup',
-						function() 
-						{
-							element.master.resize(nowX + 'px', nowY + 'px');
-							element.master.setColorFilter(nowFilter);
-						}
-					);
-				}
-			},
-
-			compile: function(innerElement)
-			{
-				var master = innerElement.domElement,
-					elem   = self.createHideMirrorHTMLElement(innerElement);
-
-				master.insertBefore(elem.domElement, master.firstChild);
-				elem.domElement.addEventListener(this.event, this.def(elem));
-
-				innerElement.mirror = elem;
-			}
-		}
-	}
-
+	// Подключенные предстваления.
 	this.views = {
 	}
 
+	// конструктор
 	this.__init__ = function()
 	{
-		this.FramePath = this.getScriptPathByMatchWord("__core__.js");
-		this.config    = window["__config__"];
-
+		this.parents   		= OOPMethods.inheritance(parents);
+		this.FramePath 		= this.getScriptPathByMatchWord("__core__.js");
+		this.config         = window["__config__"];
+		window['FramePath'] = this.FramePath;
+		
 		this.start_schedules('onLoad'); 
 	}
-
-	this.absURIPath = function(path)
-	{
-		var result = path.match(/(?!\/).+?[^\/]+$/g)[0].replace(/[^\/]+$/g, "");
-
-		return result;
-	}
-
-	this.appendFunctionOnInnerElementOnRender = function(innerElement)
-	{
-		var compileParams = innerElement.compile_parameters,
-			oldRender     = innerElement.onRender;
-
-		if (compileParams.effects) this.arrayAddition(innerElement.effects, compileParams.effects);
-
-		innerElement.onRender = function()
-		{
-			if (innerElement.onRender) oldRender();
-			
-			self.compileEffectsToElement(innerElement);
-		}
-	}
-
+	
+	// Добавления подключаемых элементов к движку.
 	this.appendMethodOrElemKey = function(path, attKey)
 	{
 		if (path.match(/modules/g)) 
@@ -427,217 +1286,6 @@ function __Core__(debug)
 		}
 	}
 
- 	this.arrayAddition = function(arr1, arr2)
- 	{
- 		var arr1 = (arr1 !== undefined) ? arr1:[],
- 			arr2 = (arr2 !== undefined) ? arr2:[];
-
- 		for (var n=0; n < arr2.length; n++)
- 		{
- 			var val = arr2[n];
-
- 			arr1.push(val);
- 		}
-
- 		return arr1;
- 	}
-
- 	this.connect = function(what, to, attributes)
-	{
-		for (var key in attributes)
-		{
-			var data = attributes[key];
-
-			what.setAttribute(key, data);
-		}
-
-		to.appendChild(what);
-	}
-
-	this.compileTextLabel = function(el, label)
-	{
-		var domElement = el.domElement,
-			elemType   = (label.position !== 'top' && label.position !== 'bottom') ? 'td':'tr',
-			elem       = document.createElement(elemType);
-		
-		label.style      = this.objectAddition(el.style.label, label.style);
-		label.content    = "<span>" + label.content + "</span>";
-		label.domElement = this.connectInnerAttsToHTMLObject(label, elem, el);
-		
-		if (label.position === 'left' || label.position === 'top')   
-		{
-			domElement.insertBefore(label.domElement, domElement.firstChild);
-		} else {
-		    domElement.appendChild(label.domElement);
-		}
-
-		return label;
-	}
-
-	this.connectInnerAttsToHTMLObject = function(innerElement, HTMLElement, paramsForElement)
-	{
-		HTMLElement.innerHTML += (innerElement.content !== undefined) ? innerElement.content:"";
-
-		this.objectAddition(HTMLElement.style, innerElement.style);
-		this.objectAddition(HTMLElement, innerElement.events);
-		this.generateDictWithIdAndClassAttributs(innerElement, HTMLElement);
-
-		return HTMLElement;
-	}
-
-	this.compileElement = function(el, master)
-	{
-		var type  = el.type
-			elem  = undefined;
-		
-		el.compile_parameters = this.cloneObject(el);
-		el.master             = (el.master !== undefined)       ? el.master:master;
-		master.children       = (master.children !== undefined) ? master.children:[];
-
-		if (type === "HTMLCollection")   elem = this.compileHTMLElement(el, master);
-		if (type === "innerElement")     elem = this.compileInnerElement(el, master);		
-		if (elem.effects)                this.appendFunctionOnInnerElementOnRender(elem);     
-		if (elem.onRender !== undefined) elem.onRender();
-		
-		elem.domElement.super = elem;
-
-		this.objectAddition(elem, this.elementsDefaultFunction);
-		this.objects.push(elem);
-		master.children.push(elem);
-
-		return elem;
-	}
-
-	this.compileEffectsToElement = function(innerElement)
-	{
-		var effects = innerElement.effects;
-
-		for (var n=0; n < effects.length; n++)
-		{
-			var name = effects[n],
-			    data = this.UI_effects[name];
-
-		   data.compile(innerElement);
-		}
-	}
-
-	this.compileHTMLElement = function(el, master)
-	{
-		var element = document.createElement(el.htmlClass),
-			master  = (master.domElement === undefined) ? master:master.domElement,
-			items   = el.items;
-		
-		this.connectInnerAttsToHTMLObject(el, element);
-		
-		el.compile_parameters = el;
-		el.domElement         = element;
-
-		if (items) this.compileElements(items, el);
-
-		if (!debug) 
-		{
-			try      {master.appendChild(element);} 
-			catch(e) {this.errorCatcher('Connect Element Error', 0, el.htmlClass, e);}
-		} else {
-			master.appendChild(element);
-		}
-
-		return el;
-	}
-
-	this.compileInnerElement = function(element, master)
-	{
-		var compiler = this.elements[element.class],
-			master   = (element.master !== undefined) ? element.master:master,
-			exemplar = new compiler(this, element, master),
-			compiled = this.elementCoreCompile(exemplar, element, master),
-			items    = compiled.items,
-			label    = element.label;
-
-		if (items) this.compileElements(items, element);
-		if (label) compiled.label = this.compileTextLabel(compiled, element.label);	
-		
-		return compiled;
-	}
-	
-	this.compileElements = function(items, master)
-	{
-		for (var n in items)
-		{
-			var elem  = items[n];
-
-			items[n] = this.compileElement(elem, master);
-		}
-	}
-
-	this.changeMainView = function(view, toDestroy)
-	{
-		var view = ((typeof view) === "object") ? view:this.getViewElement(view);
-
-		if (toDestroy) this.destView(toDestroy);
-
-		this.compileInnerElement(view);
-		//self.localStorage.setItem('mainView', view);
-	}
-
-	this.changeHTMLElementTag = function(element, newTag)
-	{
-		element.compile_parameters.htmlClass = newTag;
-
-		var elem = this.compileElement(element.compile_parameters, element.master);
-
-		element.__del__();
-	}
-
- 	this.createHideMirrorHTMLElement = function(element)
- 	{
- 		var elem  = (element.domElement !== undefined) ? element.domElement:element,
- 			rect  = elem.getBoundingClientRect(),
- 			clone = {
- 				domElement: document.createElement('div'),
- 				master:     element,
-
- 				style: 
- 				{
-	 				position: 'absolute',
-	 				left:     '0%',
-	 				right:    '0%',
-	 				width:    rect.width  + 'px',
-	 				height:   rect.height + 'px'
- 				}
- 			};
- 		
-		clone.domElement.super     =  clone;
-		clone.domElement.className = 'Hide_Mirror_Elements';
-
- 		this.objectAddition(clone.domElement.style, clone.style);
-		this.objects.push(clone);
- 		
- 		return clone;
- 	}
-
- 	this.cloneObject = function(toObj)
- 	{
- 		var object = {};
-
- 		for (var att in toObj)
- 		{
- 			object[att] = ((typeof toObj[att]) !== 'object') ? toObj[att]:this.cloneObject(toObj[att]);
- 		}
-
- 		return object;
- 	}
-	
-	this.destView = function(view)
-	{
-		console.log(view)
-		/*
-		var master = document.getElementById(view.master.id);
-
-		master.innerHtml = "";
-		*/
-	}
-
 	this.destroyClass = function(className) 
 	{
 		var elems = document.getElementsByTagName(className);
@@ -652,104 +1300,6 @@ function __Core__(debug)
 		if (document.getElementsByTagName(className).length > 0) 
 		{
 			setTimeout(function() {self.destroyClass(className);}, 500);
-		}
-	}
-
-	this.elementCoreCompile = function(exemplar, child, master)
-	{
-		var element = document.createElement(exemplar.htmlClass),
-			master  = this.getMaster(master);
-		
-		child.style      = this.objectAddition(child.style, exemplar.style);
-		child.domElement = element;
-		child            = this.objectAddition(exemplar, child);
-
-		this.connectInnerAttsToHTMLObject(exemplar, element, child);
-
-		if (!debug) 
-		{
-			try {
-				master.appendChild(element);
-			} catch(e) {
-				this.errorCatcher('Connect Element Error', 0, exemplar.domElement, e);
-			}
-		} else {
-			master.appendChild(element);
-		}
-
-		return exemplar; 
-	}
-
-	this.elementStyleCompile = function(el, params)
-	{
-		var elem = el;
-
-		for (var key in params)
-		{
-			var val = params[key]
-				att = elem[key];
-			
-			if ((typeof val) === 'object' && (typeof att) === 'object') 
-			{
-				elem[key] = this.objectAddition(att, val);
-			} else {
-				elem[key] = val;
-			}
-		}
-
-		return elem;
-	}
-
-	this.errorCatcher = function(errorType, errorNumber, args, browseError)
-	{
-		var error      = this.innerErrors[errorType][errorNumber],
-			body       = this.format(error.message, args),
-			line       = "-".repeat(body.length),
-			shablone   = "{title}\n{line}\n{body}\n{line}\nBrowser Error:\n{ge}\n{line}\n\n",
-			curMessage = this.format(shablone, {'title': errorType, 'line': line, 'body': body, 'ge': browseError});
-
-		if (error.type === 'warning') 
-		{
-			console.log(curMessage);
-		} else {
-			throw curMessage;
-		}
-	}
-
-	this.format = function(str, args)
-	{
-		var toFormat   = ((typeof args) !== "string") ? args:[args],
-			curentLine = str;
-
-		for (var n in toFormat)
-		{
-			var key = "\\{" + n + "\\}";
-			curentLine = curentLine.replace(new RegExp(key, 'g'), toFormat[n]);
-		}
-
-		return curentLine;
-	}
-
-	this.foundKey = function(obj, key, scopeLevel)
-	{
-		var found      = false,
-			scopeLevel = (scopeLevel !== undefined) ? 0:scopeLevel;
-
-		for (var att in obj)
-		{
-			var node = obj[key];
-
-			if (att === key) {
-				found = node;
-				break;
-			}
-		}
-
-		if (!found && scopeLevel !== 0)
-		{
-			for (var att in obj) this.foundKey(obj[att], key, scopeLevel - 1);
-		} else {
-			return found;
 		}
 	}
 
@@ -768,174 +1318,6 @@ function __Core__(debug)
 		return HTMLElement;
 	}
 
-	this.getAndCallMainFunctionFromElemPath = function(path)
-	{
-		var cleanName = path.replace(/(?!\/).*?(?=\/)|\//g, "").split('.')[0];
-		
-		return window[cleanName];
-	}
-	
-	this.getMaster = function(master)
-	{
-		if ((master !== undefined) && (master !== null))
-		{
-
-			if ((master.domElement !== undefined) && (master.domElement !== null)) 
-			{
-				return master.domElement;
-			}
-			else if ((master.id !== undefined) && (master.id !== null))
-			{
-				return document.getElementById(master.id);
-			}
-		}
-	}
-	
-	this.getMethodVaribleByPath = function(val)
-	{
-		var result  = val.match(/\/{1,1}[^\/]+\.{1,1}/g),
-			varible = ((typeof result) === "object") ? result[0].replace(/[\.\/]/g, ""):undefined;
-	
-		return varible;
-	}
-
-	this.getScriptPathByMatchWord = function(word, ifNotExistError)
-	{
-		var scripts = document.getElementsByTagName('script');
-
-		for (var n=0; n < scripts.length; n++)
-		{
-			var elem    = scripts[n],
-				src     = elem.src,
-				re      = new RegExp(word, 'g'),
-				result  = undefined;
-
-			if (src.match(re) !== undefined)
-			{
-				result = this.absURIPath(src);
-				break;
-			}  
-		}
-
-		if (result === undefined && !debug)
-		{
-			this.errorCatcher('Files Errors', 0, word, "Inner Error");
-		}
-
-		return result;
-	}
-
-	this.getViewElement = function(viewName)
-	{
-		var params = window[viewName];
-
-		if ((params === undefined) || (params === null))
-		{
-			this.errorCatcher('View Error', 1, viewName, "Inner Error");
-		} else {
-			params = params;
-		}
-
-		return params;
-	}
-
-	this.globalStartConnector = function(listOfElems, elemsType, elemsMaster, paramType)
-	{	
-		for (var n in listOfElems)
-		{
-			var elem   = document.createElement(elemsType),
-				val    = listOfElems[n],
-				params = {},
-				attKey = this.getMethodVaribleByPath(val);
-
-			if (attKey !== undefined) this.appendMethodOrElemKey(val, attKey);
-			params[paramType] = this.replaceKeyInStringByCoreVariable(val);
-			
-			this.connect(elem, elemsMaster, params);
-		}
-	}
-
-	this.objectAddition = function(mainObject, addObject, appended)
-	{
-		var currentObject = (mainObject !== undefined) ? mainObject:{},
-			addObject     = (addObject !== undefined)  ? addObject:{};
-
-		for (var att in addObject)
-		{
-			currentObject[att] = addObject[att];
-		}
-		
-		return currentObject;
-	}
-
-	this.replaceKeyInStringByCoreVariable = function(str)
-	{
-		var list = str.match(/\{{1,1}(.+?)\}{1,1}/g),
-			args = {};
-
-		if (list !== undefined && list !== null)
-		{
-			for (var n=0; n < list.length; n++)
-			{
-				var key = list[n].replace(/[\{\}]/g, ""),
-					val = this[key];
-
-				if (val === undefined || val === null) 
-				{
-					this.errorCatcher('Replace Key In String By Core Variable', 0, key, "Inner Error");
-				} else {
-					args[key] = val;
-				}
-			}
-		}
-
-		return this.format(str, args);
-	}
-
-	this.scrollTop = function() 
-	{
-		var scrollY = (window.scrollY) ? window.scrollY:0,
-			rect    = document.body.getBoundingClientRect(),
-			result  = Math.max(scrollY, window.pageYOffset, rect.top);
-		
-		return result + 'px';
-	}
-
-	this.setBackground = function(backGround)
-	{
-		var type = backGround.type;
-		
-		if (type === "walpers") 
-		{
-			this.setBackgroundWalpers(backGround.value);
-		}
-		else if (type === "color")   
-		{
-			this.setBackgroundColor(backGround.value);
-		}
-		else if (type !== undefined) 
-		{
-			this.errorCatcher('Background Error', 0, [backGround, type], "Inner Error");
-		} else {
-			// type not in ("walpers", "walpers") and type === undefined
-			this.errorCatcher('Background Error', 1, backGround, "Inner Error");
-		}                     
-	}
-	
-	this.setBackgroundWalpers = function(value)
-	{
-		var style = document.getElementsByTagName('body')[0].style;
-		
-		style.backgroundImage = "url('" + value + "')";
-	}
-
-	this.setBackgroundColor = function(value)
-	{
-		var body = document.getElementsByTagName('body')[0];
-
-		body.style.backgroundColor = value;
-	}
-
 	this.setCoreVaribleByKeyNameDict = function(dict, exemplar)
 	{
 		for (var key in dict)
@@ -950,43 +1332,6 @@ function __Core__(debug)
 				this.errorCatcher('Append Method or Elems Key Error', 1, key, "Inner Error");
 			}
 		}
-	}
-
-	this.start_schedules = function(shedulesName)
-	{
-		var shedules = (this.shedules[shedulesName] !== undefined) ? this.shedules[shedulesName]:false;
-
-		if (!shedules) this.errorCatcher('Shedules Error', 0, shedulesName);
-
-		for (var n=0; n < shedules.length; n++)
-		{
-			var shedule = shedules[n];
-			shedule.run = (shedule.run !== undefined) ? shedule.run:shedule.compile(this, shedule.compileArgs);
-
-				if (!debug) 
-				{
-					try {shedule.run();} 
-					catch(e) {this.errorCatcher('Shedules Error', 1, shedule.title, e);}
-				} else {
-					shedule.run();
-				}
-		}
-	}
-
-	this.viewStyleCompile = function(styles, mode)
-	{
-		var style = styles[mode];
-
-		for (var elemName in styles.universal)
-		{
-			var params    = styles.universal[elemName],
-				elem      = style[elemName],
-				elemStyle = self.elementStyleCompile(elem, params);
-			
-			elem = elemStyle; 
-		}
-
-		return style;
 	}
 
 	this.__init__();
