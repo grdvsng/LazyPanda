@@ -1337,9 +1337,8 @@ function View()
 		for (var elemName in styles.universal)
 		{
 			var params    = styles.universal[elemName],
-				elem      = style[elemName];
-
-			var	elemStyle = self.elementStyleCompile(elem, params);
+				elem      = style[elemName],
+				elemStyle = self.elementStyleCompile(elem, params);
 			
 			elem = elemStyle; 
 		}
