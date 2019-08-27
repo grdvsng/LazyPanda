@@ -1,6 +1,6 @@
 __config__ = 
 {
-	"favicon": "./bin/shaders/favicon.jpg",
+	"favicon": "./bin/shaders/favicon.gif",
 
 	"style":  "{FramePath}bin/styles/default_style.js",
 
