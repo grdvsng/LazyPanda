@@ -56,6 +56,17 @@ var default_style = {
 			'background-color': colors[1],
 			'color':            colors[0],
 			'position':         'absolute'
+		},
+
+		'List':
+		{
+			'ul':
+			{
+				'text-align':          'left',
+				'list-style-position': 'inside',
+				'font-family':         fonts[0],
+				'list-style-type':     'none'
+			}
 		}
 	},
 
@@ -116,14 +127,30 @@ var default_style = {
 
 		'MenuButton':
 		{
-			'font-size':       '14pt',
+			'font-size':       '12pt',
 			'font-weight':     700
 		},
 
 		'MenuPanel':
 		{
 			'border':          '2px solid ' + colors[0],
-			'box-shadow': 	   'inset 1px 1px 1px 1px ' + colors[2],
+			'box-shadow': 	   'inset 1px 1px 1px 1px ' + colors[2]
+		},
+
+		'List':
+		{
+			'position': 	   'relative',
+
+			'ul':
+			{
+				'font-size':    '16pt',
+				'font-weight':  700,
+
+				'li': 
+				{
+					'padding-left': '0.5em'
+				}
+			}
 		}
 	}
 }

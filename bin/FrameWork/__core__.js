@@ -1,31 +1,3 @@
-function OOP(self)
-{
-	this.__init__ = function()
-	{
-		//...
-	}
-
-	this.inheritance = function(parents)
-	{
-		var dict = [];
-
-		for (var n=0; n < parents.length; n++)
-		{
-			var parent = new parents[n]();
-			
-			dict[parent.name] = parent;
-			parent.child      = self;
-			
-			for (var att in parent) self[att] = parent[att];
-		}
-
-		return dict;
-	}
-
-	this.__init__();
-}
-
-
 function __LocalStorage__()
 {
 	var OOPMethods = new OOP(this),
@@ -71,313 +43,214 @@ function __LocalStorage__()
 }
 
 
-function Element()
+function OOP(self)
+{
+	this.__init__ = function()
+	{
+		//...
+	}
+
+	this.inheritance = function(parents, params)
+	{
+		var dict = [];
+
+		for (var n=0; n < parents.length; n++)
+		{
+			var parent = (params !== undefined) ? new parents[n](params):new parents[n]();
+			
+			dict[parent.name] = parent;
+			
+			for (var att in parent) self[att] = parent[att];
+		}
+
+		return dict;
+	}
+
+	this.__init__();
+}
+
+
+function ScrollEffects(master)
 {
 	var OOPMethods = new OOP(this),
 		self       = this,
 		parents    = [
-			Сompiler,
-			HTMLElement
 		];
-	
-	// Уневерсальные функция для всех элементов.
-	this.elementsDefaultFunction = {
-		
-		__del__: function()
-		{
-			this.removeChildren();
-			this.domElement.parentNode.removeChild(this.domElement);
 
-			for (var att in this) delete this[att];
+	this.scroller = {
+		event: 'scroll',
 
-			//self.masterUpdateObjectsList(); нужно сделать
-		},
-		
-		changeHTMLElementTag: function(newTag)
+		compile: function(elem)
 		{
-			self.changeHTMLElementTag(this, newTag);
-		},
-		
-		connectEffect: function(effectName)
-		{
-			var effect = self.UI_effects[effectName];
-			
-			return effect.compile(this);
-		},
-
-		removeChildren: function()
-		{
-			for (var n=0; n < this.domElement.childNodes.length; n++)
+			document.addEventListener(this.event, function()
 			{
-				var child = this.domElement.childNodes[n];
-
-				try {
-					child.super.__del__();
-				} catch(e) {
-					child.innerHTML = "";
-					child.parentNode.removeChild(child);
-				}
-			}
-		},
-
-		resize: function(x, y)
-		{
-			this.domElement.style.width  = y; 
-			this.domElement.style.height = x;
-		},
-
-		resizeChild: function(child, x, y)
-		{
-			try {
-				child.super.resize(x, y);
-			} catch(e) {
-				child.style.width  = y;
-				child.style.height = x;
-			}
-		},
-
-		makeLineBetweenChildNodes: function()
-		{
-			var childs = this.core.cloneArray(this.domElement.childNodes),
-				self   = (self !== undefined) ? self:this;
-
-			for (var n=0; n < childs.length; n++)
-			{
-				var child  = childs[n],
-					line   = {
-						type:      "HTMLCollection",
-						htmlClass: "br",
-					};
-
-				if (n !== 0) 
-				{
-					var elem = child.super.core.compileElement(line, self);		
-					self.domElement.insertBefore(elem.domElement, child);
-				}
-			}
-		},
-
-		makeInnerWidthForChildNodes: function(width)
-		{
-			var maxWidth = 0;
-
-			for (var n=0; n < this.domElement.childNodes.length; n++) 
-			{
-				this.resizeChild(this.domElement.childNodes[n], "", (width) + 'px');
-			}
-		},
-
-		setColorFilter: function(type, precent, byString)
-		{
-			var byString = (precent === undefined && byString === undefined) ? type:byString;
-
-			if (byString === undefined) this.domElement.style.filter = type + "(" + precent + "%)";
-			if (byString !== undefined) this.domElement.style.filter = byString;
-		},
-
-		getChildNodesMaxWidth: function()
-		{
-			var maxWidth = 0;
-
-			for (var n=0; n < this.domElement.childNodes.length; n++) 
-			{
-				var child = this.domElement.childNodes[n],
-					rect  = child.getBoundingClientRect(); 
-				maxWidth  = (rect.width > maxWidth) ? rect.width:maxWidth;
-			}
-
-			return maxWidth;
-		},
-
-		getElement: function()
-		{
-			return this.domElement;
-		},
-		
-		getSize: function(onPX)
-		{
-			var onPX = (onPX !== undefined) ? onPX:false,
-				rect = this.domElement.getBoundingClientRect(),
-				x    = (onPX) ? rect.height + 'px':rect.height,
-				y    = (onPX) ? rect.width  + 'px':rect.width;
-
-			return {
-				height: x, 
-				width:  y
-			};
-		},
-		
-		getSizeAttribute: function(att, onPX)
-		{
-			var onPX = (onPX !== undefined) ? onPX:false,
-				cur  = this.domElement.getBoundingClientRect()[att];
-
-			if (onPX) cur += 'px';
-
-			return cur;
-		},
-
-		getHeight: function(onPX)
-		{
-			return this.getSizeAttribute('height', onPX);
-		},
-
-		getWidth: function(onPX)
-		{
-			return this.getSizeAttribute('width', onPX);
-		},
-
-		hide: function()
-		{
-			this.domElement.display       = this.domElement.style.display;
-			this.domElement.style.display = 'none';
-		},
-
-		show: function()
-		{
-			this.domElement.style.display = (this.domElement.display  !== undefined) ? this.domElement.display:'block';
+				elem.domElement.style.top = elem.core.scrollTop();
+			});
 		}
 	}
 
-	// Различные графические эффекты для элементов.
-	this.UI_effects = {
-		'scroller':
-		{
-			event: 'scroll',
+	OOPMethods.inheritance(parents);
+}
 
-			compile: function(elem)
+
+function FlipEffects(master)
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+		];
+
+	this.flip_1 = {
+		event: 'click',
+
+		compile: function(elem)
+		{
+			var def = function()
 			{
-				document.addEventListener(this.event, function()
-				{
-					elem.domElement.style.top = elem.core.scrollTop();
-				});
-			}
-		},
-
-		'flip_1':
-		{
-			event: 'click',
-
-			compile: function(elem)
-			{
-				var def = function()
-				{
-					var size = elem.getSize(),
-						nowX = size.height          + 'px',
-						nowY = size.width           + 'px',
-						newX = (size.height * 0.95) + 'px',
-						newY = (size.width  * 0.95) + 'px';
-					
-					elem.resize(newX, newY);
-					setTimeout(function()
-					{
-						elem.resize(nowX, nowY);
-					}, 100);
-				};
-
-				elem.domElement.addEventListener(this.event, self.effectCompiller(this.event, def));
-			}
-		},
-
-		'flip_2':
-		{
-			event: 'click',
-
-			compile: function(elem)
-			{
-				var def = function()
-				{
-					var style = window.getComputedStyle(elem.domElement, null),
-				    oldSize = Number(style['font-size'].replace('px', ""));
-					
-					elem.domElement.style['font-size'] = (oldSize - 1) + 'px';
-
-					setTimeout(function()
-					{
-						elem.domElement.style['font-size'] = oldSize + 'px';
-					}, 100);
-				};
-
-				elem.domElement.addEventListener(this.event, self.effectCompiller(this.event, def));
-			}
-		},
-
-		'focus_1': 
-		{
-			event1: 'mouseout',
-			event2: 'mouseover',
-
-			compile: function(elem)
-			{	
-				var filer = (elem.domElement.style['filer'] !== undefined) ? elem.domElement.style['filer']:'none',
-					def1     = function()
-					{
-						elem.domElement.style['filter'] = "opacity(0.7)";
-					},
-					def2     = function()
-					{
-						elem.domElement.style['filter'] = filer;
-					};
-			
-				elem.domElement.addEventListener(this.event2, self.effectCompiller(this.event2, def1));
-				elem.domElement.addEventListener(this.event1, self.effectCompiller(this.event1, def2));
-			}
-		},
-
-		'hide panel button': 
-		{
-			event: 'click',
-
-			compile: function(elem)
-			{	
-				var filer = (elem.domElement.style['filer'] !== undefined) ? elem.domElement.style['filer']:'none',
-					def   = function()
-					{
-						console.log();
-					};
+				var size = elem.getSize(),
+					nowX = size.height          + 'px',
+					nowY = size.width           + 'px',
+					newX = (size.height * 0.95) + 'px',
+					newY = (size.width  * 0.95) + 'px';
 				
-				var style  =  window.getComputedStyle(elem.domElement),
-					params = 
-					{
-						type:    "innerElement",
-						class:   "MenuButton",
-						content: "❱",
-						style: 
-						{
-							position: 'absolute',
-							right:    '0%',
-							bottom:   '0%',
-							color:    style['color']
-						}
-					},
-					button = elem.core.compileElement(params, elem);
+				elem.resize(newX, newY);
+				setTimeout(function()
+				{
+					elem.resize(nowX, nowY);
+				}, 100);
+			};
 
-				button.domElement.addEventListener(this.event, function(e){console.log(e)});
-			}
+			elem.domElement.addEventListener(this.event, master.effectCompiller(this.event, def));
 		}
 	}
 
-	
-	this.__init__ = function()
-	{
-		OOPMethods.inheritance(parents);
+	this.flip_2 = {
+		event: 'click',
+
+		compile: function(elem)
+		{
+			var def = function()
+			{
+				var style = window.getComputedStyle(elem.domElement, null),
+			    	oldSize = Number(style['font-size'].replace('px', ""));
+				
+				elem.domElement.style['font-size'] = (oldSize - 1) + 'px';
+
+				setTimeout(function()
+				{
+					elem.domElement.style['font-size'] = oldSize + 'px';
+				}, 100);
+			};
+
+			elem.domElement.addEventListener(this.event, master.effectCompiller(this.event, def));
+		}
 	}
 
-	this.clone = function(element)
-	{
-		this.changeHTMLElementTag(element, element.domElement.tagName, true);
+	OOPMethods.inheritance(parents);
+}
+
+
+function DisplayEffects(master)
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+		];
+
+	this['hide panel button'] = {
+		event: 'click',
+
+		def: function(elem, button)
+		{
+			var size = elem.getSize(true);
+
+			return function()
+			{	
+				var hidden = (elem.childsHidden !== undefined) ? elem.childsHidden:false;
+
+				if (!hidden) 
+				{
+					button.setText('⇀');
+					elem.hideAllChildNodes(button);
+
+					elem.childsHidden = true;
+				} else {
+					button.setText('↽');
+					elem.showAllChildNodes();
+
+					elem.childsHidden = false;
+				}
+			}
+		},
+
+		compile: function(elem)
+		{	
+			var params = 
+				{
+					type:    "innerElement",
+					class:   "MenuButton",
+					content: "↽",
+					style: 
+					{
+						position: 	   	 'absolute',
+						right:    	   	 '0%',
+						bottom:   	  	 '0%',
+						color:        	 elem.getStyleAttribute('color'),
+						'font-size':  	 (elem.getStyleAttribute('font-size') + 5) + 'px'
+					}
+				},
+				button = elem.core.compileElement(params, elem);
+
+			button.domElement.addEventListener(this.event, this.def(elem, button));
+		}
 	}
 
- 	this.changeHTMLElementTag = function(element, newTag, notRemove)
-	{
-		element.compile_parameters.htmlClass = newTag;
+	OOPMethods.inheritance(parents);
+}
 
-		var elem = this.compileElement(element.compile_parameters, element.master);
 
-		if (notRemove === undefined) element.__del__();
+function FocusEffects(master)
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+		];
 
-		return elem;
+	this.focus_1 = {
+		event1: 'mouseout',
+		event2: 'mouseover',
+
+		compile: function(elem)
+		{	
+			var filer = (elem.domElement.style['filer'] !== undefined) ? elem.domElement.style['filer']:'none',
+				def1     = function()
+				{
+					elem.domElement.style['filter'] = "opacity(0.7)";
+				},
+				def2     = function()
+				{
+					elem.domElement.style['filter'] = filer;
+				};
+		
+			elem.domElement.addEventListener(this.event2, master.effectCompiller(this.event2, def1));
+			elem.domElement.addEventListener(this.event1, master.effectCompiller(this.event1, def2));
+		}
 	}
+
+	OOPMethods.inheritance(parents);
+}
+
+
+function UIEffects()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+			ScrollEffects,
+			FlipEffects,
+			DisplayEffects,
+			FocusEffects
+		];
 
 	this.effectCompiller = function(event, func)
 	{
@@ -394,6 +267,99 @@ function Element()
 				this['isOn' + event] = false;
 			}
 		}
+	}
+
+	OOPMethods.inheritance(parents, this);
+}
+
+
+function ElementsConnectFunctions()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+			Element,
+			UIEffects
+		];
+	
+	this.connectEffect = function(effectName)
+	{
+		var effect = self[effectName];
+		
+		return effect.compile(this);
+	}
+
+	OOPMethods.inheritance(parents);
+}
+
+
+function ElementsDefaultFunction()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+			ElementsGetFunctions,
+			ElementsRemoveFunctions,
+			ElementsMetamorphosesFunctions,
+			ElementsDisplayFunctions,
+			ElementsSetFunctions,
+			ElementsConnectFunctions
+		];
+
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
+	}
+
+	this.__init__();
+}
+
+
+function Element()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+			HTMLElement,
+			Сompiler
+		];
+
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
+	}
+
+	this.createNotTuchLable = function(content)
+	{
+		var obj = '<span><button style="     \
+				font-family:      inherit;  \
+				font-weight:      inherit;  \
+				font-size:        inherit;  \
+				background-color: inherit;  \
+				position:         relative; \
+				border:           none;	    \
+				text-align:       inherit;  \
+				color:         	  inherit;	\
+				outline:          none 		\
+				" onclick="" title="' + content + '">' + content + '</button></span>';        
+				
+		return obj;
+	}
+
+	this.clone = function(element)
+	{
+		this.changeHTMLElementTag(element, element.domElement.tagName, true);
+	}
+
+ 	this.changeHTMLElementTag = function(element, newTag, notRemove)
+	{
+		element.compile_parameters.htmlClass = newTag;
+
+		var elem = this.compileElement(element.compile_parameters, element.master);
+
+		if (notRemove === undefined) element.__del__();
+
+		return elem;
 	}
 
 	this.getAndCallMainFunctionFromElemPath = function(path)
@@ -434,6 +400,289 @@ function Element()
 	}
 
 	this.__init__();
+}
+
+
+function ElementsMetamorphosesFunctions()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+		];
+	
+	this.changeHTMLElementTag = function(newTag)
+	{
+		self.changeHTMLElementTag(this, newTag);
+	}
+
+	this.resize = function(x, y)
+	{
+		this.domElement.style.width  = y; 
+		this.domElement.style.height = x;
+	}
+
+	this.resizeChild = function(child, x, y)
+	{
+		try {
+			child.super.resize(x, y);
+		} catch(e) {
+			child.style.width  = y;
+			child.style.height = x;
+		}
+	}
+
+	this.makeLineBetweenChildNodes = function()
+	{
+		var childs = this.core.cloneArray(this.domElement.childNodes),
+			self   = (self !== undefined) ? self:this;
+
+		for (var n=0; n < childs.length; n++)
+		{
+			var child  = childs[n],
+				line   = {
+					type:      "HTMLCollection",
+					htmlClass: "br",
+				};
+
+			if (n !== 0) 
+			{
+				var elem = child.super.core.compileElement(line, self);		
+				self.domElement.insertBefore(elem.domElement, child);
+			}
+		}
+	}
+
+	this.makeInnerWidthForChildNodes = function(width)
+	{
+		var maxWidth = 0;
+
+		for (var n=0; n < this.domElement.childNodes.length; n++) 
+		{
+			this.resizeChild(this.domElement.childNodes[n], "", (width) + 'px');
+		}
+	}
+
+	this.balanceSizeByAnotherElem = function(elem)
+	{
+		var x1 = this.getHeight(),
+			x2 = elem.getHeight(),
+			w1 = this.getWidth(),
+			w2 = elem.getWidth();
+
+		if (x1 < x2) this.setHeight((x2 * 1.2) + 'px');
+		if (w1 < w1) this.setWidth((w2  * 1.2) + 'px');
+	}
+
+	OOPMethods.inheritance(parents);
+}
+
+
+function ElementsGetFunctions() 
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+		];
+
+	this.__del__ = function()
+	{
+		this.removeChildren();
+		this.domElement.parentNode.removeChild(this.domElement);
+
+		for (var att in this) delete this[att];
+
+		//self.masterUpdateObjectsList(); нужно сделать
+	}
+
+	this.removeChildren = function()
+	{
+		for (var n=0; n < this.domElement.childNodes.length; n++)
+		{
+			var child = this.domElement.childNodes[n];
+
+			try {
+				child.super.__del__();
+			} catch(e) {
+				child.innerHTML = "";
+				child.parentNode.removeChild(child);
+			}
+		}
+	}
+
+	this.getStyleAttribute = function(att)
+	{
+		var style = window.getComputedStyle(this.domElement),
+			value = style[att];
+
+		if (value.match(/px$/g)) value = Number(value.replace('px', ""));
+
+		return value;
+	}
+
+	this.getChildNodesMaxWidth = function()
+	{
+		var maxWidth = 0;
+
+		for (var n=0; n < this.domElement.childNodes.length; n++) 
+		{
+			var child = this.domElement.childNodes[n],
+				rect  = child.getBoundingClientRect(); 
+			maxWidth  = (rect.width > maxWidth) ? rect.width:maxWidth;
+		}
+
+		return maxWidth;
+	}
+
+	this.getElement = function()
+	{
+		return this.domElement;
+	}
+	
+	this.getSize = function(onPX)
+	{
+		var onPX = (onPX !== undefined) ? onPX:false,
+			rect = this.domElement.getBoundingClientRect(),
+			x    = (onPX) ? rect.height + 'px':rect.height,
+			y    = (onPX) ? rect.width  + 'px':rect.width;
+
+		return {
+			height: x, 
+			width:  y
+		};
+	}
+	
+	this.getSizeAttribute = function(att, onPX)
+	{
+		var onPX = (onPX !== undefined) ? onPX:false,
+			cur  = this.domElement.getBoundingClientRect()[att];
+
+		if (onPX) cur += 'px';
+
+		return cur;
+	}
+
+	this.getHeight = function(onPX)
+	{
+		return this.getSizeAttribute('height', onPX);
+	}
+
+	this.getWidth = function(onPX)
+	{
+		return this.getSizeAttribute('width', onPX);
+	}
+
+	OOPMethods.inheritance(parents);
+}
+
+
+function ElementsSetFunctions() 
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+		];
+
+	this.setDisplayModeForAllChildNodes = function(mode, _except)
+	{
+		var children = this.items,
+			mode     = (mode !== undefined) ? mode:'show';
+
+		for (var n=0; n < children.length; n++)
+		{
+			var child = children[n];
+
+			if (child !== _except) child[mode]();
+		}
+	}
+
+	this.setHeight = function(val)
+	{
+		this.domElement.style.height = val;
+	}
+	
+	this.setWidth = function(val)
+	{
+		this.domElement.style.width = val;
+	}
+
+	this.setColorFilter = function(type, precent, byString)
+	{
+		var byString = (precent === undefined && byString === undefined) ? type:byString;
+
+		if (byString === undefined) this.domElement.style.filter = type + "(" + precent + "%)";
+		if (byString !== undefined) this.domElement.style.filter = byString;
+	}
+
+	OOPMethods.inheritance(parents);
+}
+
+
+function ElementsDisplayFunctions() 
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+			ElementsSetFunctions
+		];
+
+	this.hide = function()
+	{
+		this.domElement.display       = this.domElement.style.display;
+		this.domElement.style.display = 'none';
+	}
+
+	this.show = function()
+	{
+		this.domElement.style.display = (this.domElement.display  !== undefined) ? this.domElement.display:'block';
+	}
+
+	this.hideAllChildNodes = function(_except)
+	{
+		this.setDisplayModeForAllChildNodes('hide', _except);
+	}
+
+	this.showAllChildNodes = function(_except)
+	{
+		this.setDisplayModeForAllChildNodes('show', _except);
+	}
+
+	OOPMethods.inheritance(parents);
+}
+
+
+function ElementsRemoveFunctions() 
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+		];
+
+	this.__del__ = function()
+	{
+		this.removeChildren();
+		this.domElement.parentNode.removeChild(this.domElement);
+
+		for (var att in this) delete this[att];
+
+		//self.masterUpdateObjectsList(); нужно сделать
+	}
+
+	this.removeChildren = function()
+	{
+		for (var n=0; n < this.domElement.childNodes.length; n++)
+		{
+			var child = this.domElement.childNodes[n];
+
+			try {
+				child.super.__del__();
+			} catch(e) {
+				child.innerHTML = "";
+				child.parentNode.removeChild(child);
+			}
+		}
+	}
+
+	OOPMethods.inheritance(parents);
 }
 
 
@@ -586,7 +835,6 @@ function Сompiler()
 			} else {
 				elem[key] = val;
 			}
-
 		}
 
 		return elem;
@@ -613,6 +861,7 @@ function Сompiler()
 				attKey = this.getMethodVaribleByPath(val);
 
 			if (attKey !== undefined) this.appendMethodOrElemKey(val, attKey);
+			
 			params[paramType] = this.replaceKeyInStringByExemplarVariable(val);
 			
 			this.connect(elem, elemsMaster, params);
@@ -641,8 +890,12 @@ function Сompiler()
 
 	this.connectInnerAttsToHTMLObject = function(innerElement, HTMLElement, paramsForElement)
 	{
-		HTMLElement.innerHTML += (innerElement.content !== undefined) ? "<div>" + innerElement.content.trim() +  "</div>":"";
-		
+		if (innerElement.content !== undefined) 
+		{
+			HTMLElement.innerHTML += "<div>" + innerElement.content.trim() +  "</div>";
+			HTMLElement.title      = HTMLElement.innerText
+		}
+
 		this.elementStyleCompile(HTMLElement.style, innerElement.style);
 		this.objectAddition(HTMLElement, innerElement.events);
 		this.generateDictWithIdAndClassAttributs(innerElement, HTMLElement);
@@ -654,9 +907,9 @@ function Сompiler()
 	{
 		compiled.core             = this;
 		compiled.domElement.super = compiled;
-		
-		this.objectAddition(compiled, this.elementsDefaultFunction);
 
+		this.objectAddition(compiled, new ElementsDefaultFunction);
+		
 		if (compiled.effects) 
 		{
 		    this.appendFunctionOnInnerElementOnRender(compiled);     
@@ -665,7 +918,7 @@ function Сompiler()
 		if (compiled.onRender !== undefined) compiled.onRender();
 		if (el.label)                        compiled.label = this.compileTextLabel(compiled, el.label);	
 
-		compiled.master.children.push(compiled);
+		compiled.master.items.push(compiled);
 		this.objects.push(compiled);
 	}
 
@@ -676,10 +929,7 @@ function Сompiler()
 		
 		el.compile_parameters = this.cloneObject(el);
 		master                = el.master = (el.master !== undefined) ? el.master:master;
-		master.children       = (master.children !== undefined) ? master.children:[];
-		
-		this.objectAddition(elem, this.elementsDefaultFunction);
-		
+
 		if (type === "HTMLCollection")   elem = this.compileHTMLElement(el, master);
 		if (type === "innerElement")     elem = this.compileInnerElement(el, master);		
 		
@@ -688,14 +938,12 @@ function Сompiler()
 		return elem;
 	}
 
-	this.compileElements = function(items, master)
+	this.compileElements = function(master)
 	{
-		for (var n in items)
-		{
-			var elem  = items[n];
+		var items = this.cloneArray(master.items);
+		master.items = [];
 
-			items[n] = this.compileElement(elem, master);
-		}
+		for (var n in items) this.compileElement(items[n], master);
 	}
 
 	this.compileEffectsToElement = function(element)
@@ -713,15 +961,14 @@ function Сompiler()
 	this.compileHTMLElement = function(el, master)
 	{
 		var element = document.createElement(el.htmlClass),
-			master  = (master.domElement === undefined) ? master:master.domElement,
-			items   = el.items;
+			master  = (master.domElement === undefined) ? master:master.domElement;
 		
 		this.connectInnerAttsToHTMLObject(el, element);
 		
 		el.compile_parameters = el;
 		el.domElement         = element;
 
-		if (items) this.compileElements(items, el);
+		if (el.items) this.compileElements(el);
 
 		master.appendChild(element);
 
@@ -733,10 +980,9 @@ function Сompiler()
 		var compiler = this.elements[element.class],
 			master   = (element.master !== undefined) ? element.master:master,
 			exemplar = new compiler(this, element, master),
-			compiled = this.elementCoreCompile(exemplar, element, master),
-			items    = compiled.items;
+			compiled = this.elementCoreCompile(exemplar, element, master);
 
-		if (items) this.compileElements(items, element);
+		if (compiled.items) this.compileElements(compiled);
 		
 		return compiled;
 	}

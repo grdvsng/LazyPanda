@@ -20,18 +20,28 @@ var index_view_main = {
 		effects: [
 			'hide panel button'
 		],
+
 		items: [{
-			type:    "innerElement",
-			class:   "MenuButton",
-			content: "Главная"
-		}, {
-			type:    "innerElement",
-			class:   "MenuButton",
-			content: "Контакты"
-		}, {
-			type:    "innerElement",
-			class:   "MenuButton",
-			content: "Войти"
+			type:     "innerElement",
+			class:    "List",
+			content:  "Меню",
+
+			effects: [
+			],
+
+			items: [{
+				type:    "innerElement",
+				class:   "MenuButton",
+				content: "Главная"
+			}, {
+				type:    "innerElement",
+				class:   "MenuButton",
+				content: "Контакты"
+			}, {
+				type:    "innerElement",
+				class:   "MenuButton",
+				content: "Войти"
+			}]
 		}]
 	}]
 };

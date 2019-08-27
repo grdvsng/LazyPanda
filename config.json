@@ -10,7 +10,8 @@ __config__ =
 		"{FramePath}/bin/elements/MenuPanel.js",
 		"{FramePath}/bin/elements/MenuButton.js",
 		"{FramePath}/bin/elements/DefaultView.js",
-		"{FramePath}/bin/elements/FlexMenu.js"
+		"{FramePath}/bin/elements/FlexMenu.js",
+		"{FramePath}/bin/elements/List.js"
 	],
 
 	"views": {
