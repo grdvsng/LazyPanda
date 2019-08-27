@@ -1243,7 +1243,7 @@ function PathParser()
 	{
 		var result  = val.match(/\/{1,1}[^\/]+\.{1,1}/g),
 			varible = ((typeof result) === "object") ? result[0].replace(/[\.\/]/g, ""):undefined;
-	
+		
 		return varible;
 	}
 
@@ -1337,8 +1337,9 @@ function View()
 		for (var elemName in styles.universal)
 		{
 			var params    = styles.universal[elemName],
-				elem      = style[elemName],
-				elemStyle = self.elementStyleCompile(elem, params);
+				elem      = style[elemName];
+
+			var	elemStyle = self.elementStyleCompile(elem, params);
 			
 			elem = elemStyle; 
 		}

@@ -78,23 +78,51 @@ var default_style = {
 
 		'FlexMenu':
 		{
-			'padding':          '5px',
-			'padding-bottom':   '1px',
+			'border-width':     '2px',
+			'padding':          '2px',
+			'padding-top':      '0px',
 			'font-weight':      '800',
-			'width':            '900px',
-			'heght':            '100px'
+			'width':            '50px',
+
+			'inner line': {
+				'left':       '2%',
+				'right':      '2%',
+				'height':     '4px',
+				'margin-top': '5px'
+			},
+
+			label: {
+				'font-size':   '16pt',
+				'padding-top': '6px'
+			}
 		},
 
 		'MenuButton':
 		{
-			'width':           	'20%',
-			'font-size':        '14pt',
-			'font-weight':      '700',
+			'font-size':       '12pt',
+			'font-weight':     700
 		},
 
 		'MenuPanel':
 		{
-			'border':           '2px solid ' + colors[0]
+			'border':          '2px solid ' + colors[0],
+			'box-shadow': 	   'inset 1px 1px 1px 1px ' + colors[2]
+		},
+
+		'List':
+		{
+			'position': 	   'relative',
+
+			'ul':
+			{
+				'font-size':    '16pt',
+				'font-weight':  700,
+
+				'li': 
+				{
+					'padding-left': '0.5em'
+				}
+			}
 		}
 	},
 
