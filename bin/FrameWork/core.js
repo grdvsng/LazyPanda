@@ -916,7 +916,7 @@ function Сompiler()
 		}
         
 		if (compiled.onRender !== undefined) compiled.onRender();
-		if (el.label)                        compiled.label = this.compileTextLabel(compiled, el.label);	
+		if (el.label)                        compiled.label = this.compileTextLabel(compiled, el.label);
 
 		compiled.master.items.push(compiled);
 		this.objects.push(compiled);
@@ -929,6 +929,7 @@ function Сompiler()
 		
 		el.compile_parameters = this.cloneObject(el);
 		master                = el.master = (el.master !== undefined) ? el.master:master;
+		master.items          = (master.items !== undefined) ? master.items:[];
 
 		if (type === "HTMLCollection")   elem = this.compileHTMLElement(el, master);
 		if (type === "innerElement")     elem = this.compileInnerElement(el, master);		
@@ -964,7 +965,8 @@ function Сompiler()
 			master  = (master.domElement === undefined) ? master:master.domElement;
 		
 		this.connectInnerAttsToHTMLObject(el, element);
-		
+		this.objectAddition(element, el.attributes);
+
 		el.compile_parameters = el;
 		el.domElement         = element;
 
@@ -1295,15 +1297,27 @@ function View()
 		OOPMethods.inheritance(parents);
 	}
 
-	this.changeMainView = function(view, toDestroy)
+	this.changeView = function(view, toDestroy)
 	{
-		var view     = ((typeof view) === "object") ? view:this.getViewElement(view),
-			mainView = this.compileInnerElement(view);
+		var view    = ((typeof view) === "object") ? view:this.getViewElement(view),
+			curView = this.compileInnerElement(view);
 
-		if (toDestroy) this.destView(toDestroy);
+		if (toDestroy !== undefined && toDestroy !== null) 
+		{
+			this.destView(toDestroy);
+		}
 		
+		return curView;
+	}
+
+	this.changeMainView = function(view)
+	{
+		var mainView = this.changeView(view, window['mainView']);
+
 		document.body.style.background         = mainView.style.background;
 		document.body.style['background-size'] = (mainView.style['background-size'] !== undefined) ? mainView.style['background-size']:'100%';
+		
+		window['mainView'] = mainView;
 	}
 	
 	this.destView = function(view)
@@ -1374,6 +1388,25 @@ function Win()
 			result  = Math.max(scrollY, window.pageYOffset, rect.top);
 		
 		return result + 'px';
+	}
+
+	this.changeFalcon = function(falconPath)
+	{
+		var params = 
+			{
+				type:      "HTMLCollection",
+				htmlClass: "link",
+				
+				attributes:
+				{
+					rel:       "icon",
+					href:      falconPath
+				}
+			};
+		
+		document.head.items = this.cloneArray(document.head.children);
+
+		this.compileElement(params, document.head);
 	}
 
 	this.__init__();
@@ -1468,6 +1501,17 @@ function __Core__(debug)
 			{
 				self.destroyClass('script');
 			}
+		}, {
+			title: 'Connect page icon.',
+
+			run: function()
+			{
+				if (self.config.falcon)
+				{
+					self.changeFalcon(self.config.falcon);
+				}
+			}
+	
 		}]
 	}
 
@@ -1479,10 +1523,7 @@ function __Core__(debug)
 	]
 
 	// Главное представление страницы.
-	this.mainView = {
-		title: null,
-		data: null
-	}
+	this.mainView = undefined;
 
 	// Подключенные модули подключаются в данный список.
 	this.modules = {
