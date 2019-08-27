@@ -1,17 +1,17 @@
 __config__ = 
 {
-	"style":  "{FramePath}/bin/styles/default_style.js",
+	"style":  "{FramePath}bin/styles/default_style.js",
 
 	"modules": [
-		"{FramePath}/bin/modules/MethodsForObjects.js"
+		"{FramePath}bin/modules/MethodsForObjects.js"
 	],
 
 	"elements": [
-		"{FramePath}/bin/elements/MenuPanel.js",
-		"{FramePath}/bin/elements/MenuButton.js",
-		"{FramePath}/bin/elements/DefaultView.js",
-		"{FramePath}/bin/elements/FlexMenu.js",
-		"{FramePath}/bin/elements/List.js"
+		"{FramePath}bin/elements/MenuPanel.js",
+		"{FramePath}bin/elements/MenuButton.js",
+		"{FramePath}bin/elements/DefaultView.js",
+		"{FramePath}bin/elements/FlexMenu.js",
+		"{FramePath}bin/elements/List.js"
 	],
 
 	"views": {
