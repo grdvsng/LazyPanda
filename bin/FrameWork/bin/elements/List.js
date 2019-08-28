@@ -11,6 +11,9 @@ var List = function(core, child, master)
 	this.style      = than.style.parameters[this.class];
 	this.items      = null;
 	this.content    = (child !== undefined) ? child.content:"";
+	this.effects    = [
+		'hide list'
+	]
 
 	this.converChildItemsToList = function(items)
 	{
@@ -21,7 +24,7 @@ var List = function(core, child, master)
 			child  = {
 				type:      'HTMLCollection', 
 				htmlClass: 'th',
-				content:   than.createNotTuchLable(self.content),
+				content:   than.createNotTuchLable(self.content, self.style['ul']),
 				style:     self.style['ul']
 			},
 			_items = [];

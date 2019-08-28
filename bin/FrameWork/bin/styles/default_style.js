@@ -1,8 +1,8 @@
 var colors = [
-	'White',
-	'#1F4E6B',
-	'#1F4E7B',
-	'Black'
+		'White',
+		'#1F4E6B',
+		'#1F4E7B',
+		'Black'
 	],
 	
 	fonts = [
@@ -41,7 +41,7 @@ var default_style = {
 		'MenuButton':
 		{
 			'font-family':      fonts[0],
-			'background-color': 'inherit',
+			'background-color': colors[1],
 			'position':         'relative',
 			'border':         	'none',
 			'text-align':       'left',
@@ -60,13 +60,17 @@ var default_style = {
 
 		'List':
 		{
+			'background-color': colors[1],
+
 			'ul':
 			{
 				'text-align':          'left',
 				'list-style-position': 'inside',
 				'font-family':         fonts[0],
+				'background-color':    colors[1],
+				'color':               'inherit',
 				'list-style-type':     'none'
-			}
+			},
 		}
 	},
 

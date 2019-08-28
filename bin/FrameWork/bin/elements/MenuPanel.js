@@ -45,7 +45,9 @@ var MenuPanel = function(core, child, master)
 			}
 	}]
 
-	this.effects = than.arrayAddition(child.effects, ['scroller']);
+	this.effects = [
+		'scroller'
+	];
 
 	this.changePos = function(positionNumber)
 	{

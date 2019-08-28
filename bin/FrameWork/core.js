@@ -157,7 +157,8 @@ function DisplayEffects(master)
 		parents    = [
 		];
 
-	this['hide panel button'] = {
+	this['hide panel button'] = 
+	{
 		event: 'click',
 
 		def: function(elem, button)
@@ -202,6 +203,24 @@ function DisplayEffects(master)
 				button = elem.core.compileElement(params, elem);
 
 			button.domElement.addEventListener(this.event, this.def(elem, button));
+		}
+	}
+
+	this['hide list'] = 
+	{
+		event: 'click',
+
+		def: function(elem)
+		{
+			return function()
+			{
+				console.log(0)
+			}
+		},
+
+		compile: function(elem)
+		{	
+			elem.domElement.addEventListener(this.event, this.def(elem));
 		}
 	}
 
@@ -278,13 +297,11 @@ function ElementsConnectFunctions()
 	var OOPMethods = new OOP(this),
 		self       = this,
 		parents    = [
-			Element,
-			UIEffects
 		];
 	
 	this.connectEffect = function(effectName)
 	{
-		var effect = self[effectName];
+		var effect = new UIEffects()[effectName];
 		
 		return effect.compile(this);
 	}
@@ -306,12 +323,8 @@ function ElementsDefaultFunction()
 			ElementsConnectFunctions
 		];
 
-	this.__init__ = function()
-	{
-		OOPMethods.inheritance(parents);
-	}
 
-	this.__init__();
+	OOPMethods.inheritance(parents, this);
 }
 
 
@@ -329,21 +342,21 @@ function Element()
 		OOPMethods.inheritance(parents);
 	}
 
-	this.createNotTuchLable = function(content)
+	this.createNotTuchLable = function(content, style)
 	{
-		var obj = '<span><button style="     \
-				font-family:      inherit;  \
-				font-weight:      inherit;  \
-				font-size:        inherit;  \
-				background-color: inherit;  \
-				position:         relative; \
-				border:           none;	    \
-				text-align:       inherit;  \
-				color:         	  inherit;	\
-				outline:          none 		\
-				" onclick="" title="' + content + '">' + content + '</button></span>';        
-				
-		return obj;
+		var span = document.createElement('span'),
+		 	elem = document.createElement('button');
+		
+		elem.innerText     = content;        
+		elem.style.border  = 'none';
+		elem.style.outline = 'none';
+
+		this.objectAddition(elem.style, style);
+		span.appendChild(elem);
+		
+		elem = "<span>" + span.innerHTML + "</span>";
+
+		return elem;
 	}
 
 	this.clone = function(element)
@@ -754,11 +767,23 @@ function ErrorsCatcher()
 		}]
 	}
 
+	this.repeatString = function(str, step)
+	{
+		var curent = "";
+
+		for (var n=0; n < step; n++)
+		{
+			curent += str;
+		}
+
+		return curent;
+	}
+	
 	this.errorCatcher = function(errorType, errorNumber, args, browseError)
 	{
 		var error      = this.errors[errorType][errorNumber],
 			body       = this.format(error.message, args),
-			line       = "-".repeat(body.length),
+			line       = this.repeatString("-", body.length),
 			shablone   = "{title}\n{line}\n{body}\n{line}\nBrowser Error:\n{ge}\n{line}\n\n",
 			curMessage = this.format(shablone, {'title': errorType, 'line': line, 'body': body, 'ge': browseError});
 
@@ -808,13 +833,15 @@ function Сompiler()
 		var element = document.createElement(exemplar.htmlClass),
 			master  = this.getMaster(master);
 		
-		child.style      = this.elementStyleCompile(exemplar.style, child.style);
-		child.domElement = element;
-		child            = this.objectAddition(exemplar, child);
-
+		exemplar.domElement = element;
+		child.style 	    = this.elementStyleCompile(exemplar.style, child.style); 
+		
+		if (child.effects !== undefined) child.effects = this.arrayAddition(exemplar.effects, child.effects, true);
+		
+		this.objectAddition(exemplar, child);
 		this.connectInnerAttsToHTMLObject(exemplar, element, child);
 		master.appendChild(element);
-
+		
 		return exemplar; 
 	}
 
@@ -890,10 +917,12 @@ function Сompiler()
 
 	this.connectInnerAttsToHTMLObject = function(innerElement, HTMLElement, paramsForElement)
 	{
+		var title = (HTMLElement.title !== undefined) ? HTMLElement.title:innerElement.compile_parameters.title;
+
 		if (innerElement.content !== undefined) 
 		{
 			HTMLElement.innerHTML += "<div>" + innerElement.content.trim() +  "</div>";
-			HTMLElement.title      = HTMLElement.innerText
+			HTMLElement.title      = (title !== undefined) ? title:this.stringSlice(HTMLElement.innerText, 40);
 		}
 
 		this.elementStyleCompile(HTMLElement.style, innerElement.style);
@@ -908,13 +937,9 @@ function Сompiler()
 		compiled.core             = this;
 		compiled.domElement.super = compiled;
 
-		this.objectAddition(compiled, new ElementsDefaultFunction);
+		this.objectAddition(compiled, new ElementsDefaultFunction());
 		
-		if (compiled.effects) 
-		{
-		    this.appendFunctionOnInnerElementOnRender(compiled);     
-		}
-        
+		if (compiled.effects)                this.appendFunctionOnInnerElementOnRender(compiled);
 		if (compiled.onRender !== undefined) compiled.onRender();
 		if (el.label)                        compiled.label = this.compileTextLabel(compiled, el.label);
 
@@ -977,15 +1002,15 @@ function Сompiler()
 		return el;
 	}
 
-	this.compileInnerElement = function(element, master)
+	this.compileInnerElement = function(elem, master)
 	{
-		var compiler = this.elements[element.class],
-			master   = (element.master !== undefined) ? element.master:master,
-			exemplar = new compiler(this, element, master),
-			compiled = this.elementCoreCompile(exemplar, element, master);
-
-		if (compiled.items) this.compileElements(compiled);
+		var compiler = this.elements[elem.class],
+			master   = (elem.master !== undefined) ? elem.master:master,
+			exemplar = new compiler(this, elem, master),
+			compiled = this.elementCoreCompile(exemplar, elem, master);
 		
+		if (compiled.items) this.compileElements(compiled);
+
 		return compiled;
 	}
 
@@ -1044,6 +1069,15 @@ function Formatting()
 		}
 
 		return this.format(str, args);
+	}
+
+	this.stringSlice = function(str, maxLength)
+	{
+		var result = str;
+
+		if (str.length >= maxLength) result = (str.slice(0, maxLength - 3)) + "...";
+	
+		return result;
 	}
 
 	this.__init__();
@@ -1141,28 +1175,26 @@ function Obj()
 		OOPMethods.inheritance(parents);
 	}
 
+	this.removeDuplicate = function(arr)
+	{
+		var set =  new Set(arr);
+
+		return Array.from(set);
+	}
+
 	// Слияние списков
- 	this.arrayAddition = function(arr1, arr2)
+ 	this.arrayAddition = function(arr1, arr2, remDup)
  	{
- 		var loop = (loop !== undefined) ? loop:false,
- 			arr1 = (arr1 !== undefined) ? arr1:[],
- 			arr2 = (arr2 !== undefined) ? arr2:[];
+ 		var loop   = (loop   !== undefined) ? loop:false,
+ 			arr1   = (arr1   !== undefined) ? arr1:[],
+ 			arr2   = (arr2   !== undefined) ? arr2:[],
+ 			remDup = (remDup !== undefined) ? remDup:false,
+ 			loop   = arr2.length;
 
-		if (arr1.length > arr2.length)
-		{
-			var temp = this.cloneArray(arr1);
-
-			arr1 = this.cloneArray(arr2);
-			arr2 = temp;
-		}
-
- 		for (var n=0; n < arr2.length; n++)
- 		{
- 			var val = arr2[n];
-
- 			arr1.push(val);
- 		}
-
+ 		for (var n=0; n < loop; n++) arr1.push(arr2[n]);
+ 		
+ 		if (remDup) arr1 = this.removeDuplicate(arr1, arr2);
+ 		
  		return arr1;
  	}
 
@@ -1170,8 +1202,8 @@ function Obj()
  	this.objectAddition = function(mainObject, addObject, specialParser)
 	{
 		var specialParser = (specialParser !== undefined) ? specialParser:false,
-			currentObject = (mainObject !== undefined)    ? mainObject:{},
-			addObject     = (addObject !== undefined)     ? addObject:{};
+			currentObject = (mainObject    !== undefined) ? mainObject:{},
+			addObject     = (addObject     !== undefined) ? addObject:{};
 
 		for (var att in addObject)
 		{
@@ -1316,8 +1348,9 @@ function View()
 
 		document.body.style.background         = mainView.style.background;
 		document.body.style['background-size'] = (mainView.style['background-size'] !== undefined) ? mainView.style['background-size']:'100%';
-		
-		window['mainView'] = mainView;
+		window['mainView']                     = mainView;
+
+		return mainView;
 	}
 	
 	this.destView = function(view)
