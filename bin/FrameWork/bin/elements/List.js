@@ -17,40 +17,22 @@ var List = function(core, child, master)
 
 	this.converChildItemsToList = function(items)
 	{
-		var td     = {
-				type:      'HTMLCollection', 
-				htmlClass: 'table',
-			},
-			child  = {
-				type:      'HTMLCollection', 
-				htmlClass: 'th',
-				content:   than.createNotTuchLable(self.content, self.style['ul']),
-				style:     self.style['ul']
-			},
-			_items = [];
+		var caption = than.createNotTuchLable(child.master, self.style['ul'], self.content),
+			table   = {
+				items: [{
+					type:      'HTMLCollection', 
+					htmlClass: 'th',
+					style:     self.style['ul'],
+					class:     'caption',
+					items:     caption
+				}]
+			};
 
-		for (var n=0; n < items.length; n++)
-		{
-			var elem = items[n],
-				tr   = {
-					type:      'HTMLCollection',
-					htmlClass: 'tr',
-				},
-				obj  = {
-					type:      'HTMLCollection',
-					htmlClass: 'td',
-					style:     self.style['ul']['li'],
-					items:     [elem]
-				};
+		than.appendItemsInTable(table, items, self.style['ul']['li'], true);
 
-			_items.push(obj);
-			if (n != items.length) _items.push(tr);
-		}
-		
-		child.items = _items;
-		td.items    = [child];
+		self.caption = table.items[0];
 
-		return [td];
+		return table.items;
 	}
 
 	this.compile = function(child, master)

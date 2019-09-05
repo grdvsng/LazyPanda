@@ -29,7 +29,7 @@ var index_view_main = {
 			effects: [
 				'hide list'
 			],
-
+			
 			items: [{
 				type:    "innerElement",
 				class:   "MenuButton",

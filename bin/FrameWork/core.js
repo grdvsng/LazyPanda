@@ -1,9 +1,132 @@
+var __ErrorsCatcher__ = new (function ()
+{
+	var OOPMethods = new OOP(this),
+		self       = this,
+		parents    = [
+		];
+	
+	this.__init__ = function()
+	{
+		OOPMethods.inheritance(parents);
+	}
+
+	// Внутренние ошибки.
+	this.errors = {
+		'View Error': [{
+			type:    "error",
+			message: "Can't compile view: '{0}', check your views."
+		}, {
+			type:    "error",
+			message: "Parameters for view: '{0}', not found."
+		}],
+
+		'Shedules Error': [{
+				type:    "warning",
+				message: "Shedules: '{0}', not found."
+		},  {
+				type:    "error",
+				message: "Can't run shedule: '{0}'."
+			}
+		],
+
+		'Replace Key In String By Core Variable': [{
+			type:    "warning",
+			message: "Variable: '{0}', not found in Core."
+		}],
+
+		'Background Error': [{
+			type:    "warning",
+			message: "Background: '{0}', type '{1}', not found."
+		}, {
+			type:    "warning",
+			message: "Background: '{0}', incorect object."
+		}],
+
+		'Browser Error': [{
+			type:    "warning",
+			message: "Browser not support localStorage"
+		}],
+
+		'Append Method or Elems Key Error': [{
+			type:    "warning",
+			message: "Can't find typeof: '{0}'."
+		}, {
+			type:    "warning",
+			message: "Can't find method for: '{0}'."
+		}],
+
+		'Connect Element Error': [{
+			type:    "warning",
+			message: "Can't find master for: \n'{0}'."
+		}, {
+			type:    "warning",
+			message: "Can't find effect with name: '{0}'\nfor elem: '{1}'."
+		}],
+
+		'Files Errors': [{
+			type:    "error",
+			message: "No one script match '{0}'."
+		}],
+
+		'Effects Error': [{
+			type:    "warning",
+			message: "For effect '{0}', need have element: '{1}' on super."
+		}]
+	}
+
+	this.repeatString = function(str, step)
+	{
+		var curent = "";
+
+		for (var n=0; n < step; n++)
+		{
+			curent += str;
+		}
+
+		return curent;
+	}
+	
+	this.catch = function(errorType, errorNumber, args, browseError)
+	{
+		var error       = this.errors[errorType][errorNumber],
+			body        = this.format(error.message, args),
+			line        = this.repeatString("-", body.length),
+			shablone    = "{title}\n{line}\n{body}\n{line}\nBrowser Error:\n{ge}\n{line}\n\n",
+			browseError = (browseError !== undefined) ? browseError:'Core Error',
+			ignore      = (window['__debug__'] !== undefined) ? window['__debug__']:false,
+			curMessage  = this.format(shablone, {'title': errorType, 'line': line, 'body': body, 'ge': browseError});
+			
+		if (error.type === 'warning' || ignore)
+		{
+			console.log(curMessage);
+		} else {
+			throw curMessage;
+		}
+	}
+
+	this.format = function(str, args)
+	{
+		var toFormat   = ((typeof args) !== "string") ? args:[args],
+			curentLine = str;
+
+		for (var n in toFormat)
+		{
+			var key = "\\{" + n + "\\}";
+			curentLine = curentLine.replace(new RegExp(key, 'g'), toFormat[n]);
+		}
+
+		return curentLine;
+	}
+
+	this.__init__();
+})();
+
+
 function __LocalStorage__()
 {
 	var OOPMethods = new OOP(this),
 		self       = this,
 		parents    = [
-			ErrorsCatcher
 		];
 
 	this.__init__ = function()
@@ -13,7 +136,7 @@ function __LocalStorage__()
 
 	this.LocalStorageOnError = function(e)
 	{
-		self.errorCatcher('Browser Error', 0, null, e);
+		__ErrorsCatcher__.catch('Browser Error', 0, null, e);
 	}
 
 	this.getLocalStorageItem = function(key)
@@ -107,17 +230,26 @@ function FlipEffects(master)
 		{
 			var def = function()
 			{
-				var size = elem.getSize(),
-					nowX = size.height          + 'px',
-					nowY = size.width           + 'px',
-					newX = (size.height * 0.95) + 'px',
-					newY = (size.width  * 0.95) + 'px';
-				
-				elem.resize(newX, newY);
-				setTimeout(function()
+				var self     = this,
+					onResize = (this.onResize !== undefined) ? this.onResize:false;
+
+				if (!onResize)
 				{
-					elem.resize(nowX, nowY);
-				}, 100);
+					var size = elem.getSize(),
+						nowX = size.height          + 'px',
+						nowY = size.width           + 'px',
+						newX = (size.height * 0.9)  + 'px',
+						newY = (size.width  * 0.9)  + 'px';
+					self.onResize = true;
+
+					elem.resize(newX, newY);
+
+					setTimeout(function()
+					{
+						elem.resize(nowX, nowY);
+						self.onResize = false;
+					}, 100);
+				}
 			};
 
 			elem.domElement.addEventListener(this.event, master.effectCompiller(this.event, def));
@@ -212,15 +344,34 @@ function DisplayEffects(master)
 
 		def: function(elem)
 		{
+
 			return function()
 			{
-				console.log(0)
+				var children = elem.domElement.childNodes,
+					hidden   = elem.listHidden || false;
+
+				if (!hidden)
+				{
+					elem.hideAllChildNodes(elem.caption);
+					elem.listHidden = true;
+				} else {
+					elem.showAllChildNodes(elem.caption);
+					elem.listHidden = false;
+				}
 			}
 		},
 
 		compile: function(elem)
 		{	
-			elem.domElement.addEventListener(this.event, this.def(elem));
+			if (elem.caption !== undefined) 
+			{
+				elem.caption.class = 'caption';
+				
+				elem.caption.connectEffect('flip_2', true);
+				elem.caption.domElement.addEventListener(this.event, this.def(elem));
+			} else {
+				__ErrorsCatcher__.catch('Effects Error', 0, ['hide list', 'caption']);
+			}
 		}
 	}
 
@@ -299,11 +450,34 @@ function ElementsConnectFunctions()
 		parents    = [
 		];
 	
-	this.connectEffect = function(effectName)
+	this.connectEffects = function(effects, forAllChilds)
 	{
-		var effect = new UIEffects()[effectName];
+		for (var n=0; n < effects.length; n++) 
+		{
+			this.connectEffect(effects[n], forAllChilds);
+		}
+	}
+
+	this.connectEffect = function(effectName, forAllChilds)
+	{
+		var effect       = new UIEffects()[effectName],
+			forAllChilds = forAllChilds || false;
+
+		if (effect !== undefined)
+		{
+			effect.compile(this);
+		} else {
+			__ErrorsCatcher__.catch('Connect Element Error', 1, [effectName, this.class])
+			return null;
+		}
 		
-		return effect.compile(this);
+		if (forAllChilds) 
+		{
+			for (var n=0; n < this.items.length; n++) 
+			{
+				this.items[n].connectEffect(effectName, forAllChilds);
+			}
+		}
 	}
 
 	OOPMethods.inheritance(parents);
@@ -323,7 +497,6 @@ function ElementsDefaultFunction()
 			ElementsConnectFunctions
 		];
 
-
 	OOPMethods.inheritance(parents, this);
 }
 
@@ -342,21 +515,50 @@ function Element()
 		OOPMethods.inheritance(parents);
 	}
 
-	this.createNotTuchLable = function(content, style)
+	this.createNotTuchLable = function(master, style, content)
 	{
-		var span = document.createElement('span'),
-		 	elem = document.createElement('button');
+		var params = {
+			'type':      'HTMLCollection',
+			'class':     'NotTuchLable',
+			'htmlClass': 'button',
+			'content': 	 content,
+			'style':     style,
+			'items':     []
+		};
 		
-		elem.innerText     = content;        
-		elem.style.border  = 'none';
-		elem.style.outline = 'none';
+		params.style.border  = 'none';
+		params.style.outline = 'none';
 
-		this.objectAddition(elem.style, style);
-		span.appendChild(elem);
-		
-		elem = "<span>" + span.innerHTML + "</span>";
+		return params;
+	}
 
-		return elem;
+	this.appendItemsInTable = function(table, items, rowStyle, notEmpty)
+	{
+		var notEmpty = notEmpty || false;
+		table.items  = (Array.isArray(table.items)) ? table.items:[table.items];;
+
+		for (var n=0; n < items.length; n++)
+		{
+			var elem = items[n],
+				tr   = {
+					type:      'HTMLCollection',
+					htmlClass: 'tr'
+				},
+				obj  = {
+					type:      'HTMLCollection',
+					htmlClass: 'td',
+					style:     rowStyle,
+					items:     elem
+				};
+
+			if (n === 0 && notEmpty) table.items.push(tr);
+			
+			table.items.push(obj);
+
+			if (n != items.length)   table.items.push(tr);
+		}
+
+		return table;
 	}
 
 	this.clone = function(element)
@@ -640,13 +842,13 @@ function ElementsDisplayFunctions()
 
 	this.hide = function()
 	{
-		this.domElement.display       = this.domElement.style.display;
+		this.domElement.defDisplay    = this.domElement.defDisplay || window.getComputedStyle(this.domElement).display;
 		this.domElement.style.display = 'none';
 	}
 
 	this.show = function()
 	{
-		this.domElement.style.display = (this.domElement.display  !== undefined) ? this.domElement.display:'block';
+		this.domElement.style.display = this.domElement.defDisplay || 'block';
 	}
 
 	this.hideAllChildNodes = function(_except)
@@ -699,120 +901,6 @@ function ElementsRemoveFunctions()
 }
 
 
-function ErrorsCatcher()
-{
-	var OOPMethods = new OOP(this),
-		self       = this,
-		parents    = [
-		];
-	
-	this.__init__ = function()
-	{
-		OOPMethods.inheritance(parents);
-	}
-
-	// Внутренние ошибки.
-	this.errors = {
-		'View Error': [{
-			type:    "error",
-			message: "Can't compile view: '{0}', check your views."
-		}, {
-			type:    "error",
-			message: "Parameters for view: '{0}', not found."
-		}],
-
-		'Shedules Error': [{
-				type:    "warning",
-				message: "Shedules: '{0}', not found."
-		},  {
-				type:    "error",
-				message: "Can't run shedule: '{0}'."
-			}
-		],
-
-		'Replace Key In String By Core Variable': [{
-			type:    "warning",
-			message: "Variable: '{0}', not found in Core."
-		}],
-
-		'Background Error': [{
-			type:    "warning",
-			message: "Background: '{0}', type '{1}', not found."
-		}, {
-			type:    "warning",
-			message: "Background: '{0}', incorect object."
-		}],
-
-		'Browser Error': [{
-			type:    "warning",
-			message: "Browser not support localStorage"
-		}],
-
-		'Append Method or Elems Key Error': [{
-			type:    "warning",
-			message: "Can't find typeof: '{0}'."
-		}, {
-			type:    "warning",
-			message: "Can't find method for: '{0}'."
-		}],
-
-		'Connect Element Error': [{
-			type:    "warning",
-			message: "Can't find master for: \n'{0}'."
-		}],
-
-		'Files Errors': [{
-			type:    "error",
-			message: "No one script match '{0}'."
-		}]
-	}
-
-	this.repeatString = function(str, step)
-	{
-		var curent = "";
-
-		for (var n=0; n < step; n++)
-		{
-			curent += str;
-		}
-
-		return curent;
-	}
-	
-	this.errorCatcher = function(errorType, errorNumber, args, browseError)
-	{
-		var error      = this.errors[errorType][errorNumber],
-			body       = this.format(error.message, args),
-			line       = this.repeatString("-", body.length),
-			shablone   = "{title}\n{line}\n{body}\n{line}\nBrowser Error:\n{ge}\n{line}\n\n",
-			curMessage = this.format(shablone, {'title': errorType, 'line': line, 'body': body, 'ge': browseError});
-
-		if (error.type === 'warning') 
-		{
-			console.log(curMessage);
-		} else {
-			throw curMessage;
-		}
-	}
-
-	this.format = function(str, args)
-	{
-		var toFormat   = ((typeof args) !== "string") ? args:[args],
-			curentLine = str;
-
-		for (var n in toFormat)
-		{
-			var key = "\\{" + n + "\\}";
-			curentLine = curentLine.replace(new RegExp(key, 'g'), toFormat[n]);
-		}
-
-		return curentLine;
-	}
-
-	this.__init__();
-}
-
-
 function Сompiler()
 {
 	var OOPMethods = new OOP(this),
@@ -828,7 +916,7 @@ function Сompiler()
 	}
 
 
-	this.elementCoreCompile = function(exemplar, child, master)
+	this.elementCoreCompile = function(exemplar, child, master, notAppend)
 	{
 		var element = document.createElement(exemplar.htmlClass),
 			master  = this.getMaster(master);
@@ -840,7 +928,8 @@ function Сompiler()
 		
 		this.objectAddition(exemplar, child);
 		this.connectInnerAttsToHTMLObject(exemplar, element, child);
-		master.appendChild(element);
+		
+		if (!notAppend) master.appendChild(element);
 		
 		return exemplar; 
 	}
@@ -867,11 +956,25 @@ function Сompiler()
 		return elem;
 	}
 
-	this.generateID = function(element, replace)
+	this.generateIDForHTMLElement = function(element)
+	{
+		var id = this.generateIDByClassName(element.className);
+
+		return id;
+	}
+
+	this.generateIDByClassName = function(className)
+	{
+		var id = className + "_" + document.getElementsByClassName(className).length;
+	
+		return id;
+	}
+
+	this.generateIDForCoreElement = function(element, replace)
 	{
 		var replace = !(replace !== undefined),
 			old_ID  = element.domElement.id,
-			new_ID  = element.domElement.className + "_" + document.getElementsByClassName(element.domElement.className).length;
+			new_ID  = this.generateIDByClassName(element.domElement.className);
 		
 		if (!replace && old_ID !== undefined && old_ID !== null) new_ID = old_ID;
 		
@@ -934,8 +1037,9 @@ function Сompiler()
 	
 	this.afterCompile   = function(el, compiled)
 	{
-		compiled.core             = this;
-		compiled.domElement.super = compiled;
+		compiled.compile_parameters = el;
+		compiled.core               = this;
+		compiled.domElement.super   = compiled;
 
 		this.objectAddition(compiled, new ElementsDefaultFunction());
 		
@@ -947,17 +1051,17 @@ function Сompiler()
 		this.objects.push(compiled);
 	}
 
-	this.compileElement = function(el, master)
+	this.compileElement = function(el, master, notAppend)
 	{
-		var type  = el.type
-			elem  = undefined;
+		var type      = el.type
+			elem      = undefined,
+			notAppend = notAppend || false;
 		
-		el.compile_parameters = this.cloneObject(el);
 		master                = el.master = (el.master !== undefined) ? el.master:master;
 		master.items          = (master.items !== undefined) ? master.items:[];
 
-		if (type === "HTMLCollection")   elem = this.compileHTMLElement(el, master);
-		if (type === "innerElement")     elem = this.compileInnerElement(el, master);		
+		if (type === "HTMLCollection")   elem = this.compileHTMLElement(el, master, notAppend);
+		if (type === "innerElement")     elem = this.compileInnerElement(el, master, notAppend);		
 		
 		this.afterCompile(el, elem);
 
@@ -966,10 +1070,10 @@ function Сompiler()
 
 	this.compileElements = function(master)
 	{
-		var items = this.cloneArray(master.items);
+		var items = (Array.isArray(master.items)) ? this.cloneArray(master.items):[master.items];
 		master.items = [];
 
-		for (var n in items) this.compileElement(items[n], master);
+		for (var n in items) this.compileElement(items[n], master, items[n].notAppend);
 	}
 
 	this.compileEffectsToElement = function(element)
@@ -984,7 +1088,7 @@ function Сompiler()
 		}
 	}
 
-	this.compileHTMLElement = function(el, master)
+	this.compileHTMLElement = function(el, master, notAppend)
 	{
 		var element = document.createElement(el.htmlClass),
 			master  = (master.domElement === undefined) ? master:master.domElement;
@@ -995,19 +1099,18 @@ function Сompiler()
 		el.compile_parameters = el;
 		el.domElement         = element;
 
-		if (el.items) this.compileElements(el);
-
-		master.appendChild(element);
+		if (el.items)   this.compileElements(el);
+		if (!notAppend) master.appendChild(element);
 
 		return el;
 	}
 
-	this.compileInnerElement = function(elem, master)
+	this.compileInnerElement = function(elem, master, notAppend)
 	{
 		var compiler = this.elements[elem.class],
 			master   = (elem.master !== undefined) ? elem.master:master,
 			exemplar = new compiler(this, elem, master),
-			compiled = this.elementCoreCompile(exemplar, elem, master);
+			compiled = this.elementCoreCompile(exemplar, elem, master, notAppend);
 		
 		if (compiled.items) this.compileElements(compiled);
 
@@ -1023,7 +1126,6 @@ function Formatting()
 	var OOPMethods = new OOP(this),
 		self       = this,
 		parents    = [
-			ErrorsCatcher
 		];
 	
 	this.__init__ = function()
@@ -1061,7 +1163,7 @@ function Formatting()
 
 				if (val === undefined || val === null) 
 				{
-					this.errorCatcher('Replace Key In String By Core Variable', 0, key, "Inner Error");
+					__ErrorsCatcher__.catch('Replace Key In String By Core Variable', 0, key, "Inner Error");
 				} else {
 					args[key] = val;
 				}
@@ -1148,12 +1250,9 @@ function HTMLElement()
 			{
 				result = this.absURIPath(src);
 				break;
-			}  
-		}
-
-		if (result === undefined && !debug)
-		{
-			this.errorCatcher('Files Errors', 0, word, "Inner Error");
+			}  else {
+				__ErrorsCatcher__.catch('Files Errors', 0, word);
+			}
 		}
 
 		return result;
@@ -1209,6 +1308,9 @@ function Obj()
 		{
 			var val = addObject[att];
 
+			if (Array.isArray(val))                               val = this.cloneArray(val);
+			if ((typeof val) === 'object' && !Array.isArray(val)) val = this.cloneObject(val);
+			
 			currentObject[att] = (specialParser) ? specialParser(val):val;
 		}
 		
@@ -1301,7 +1403,7 @@ function Sheduler()
 	{
 		var shedules = (this.shedules[shedulesName] !== undefined) ? this.shedules[shedulesName]:false;
 
-		if (!shedules) this.errorCatcher('Shedules Error', 0, shedulesName);
+		if (!shedules) __ErrorsCatcher__.catch('Shedules Error', 0, shedulesName);
 
 		for (var n=0; n < shedules.length; n++)
 		{
@@ -1369,7 +1471,7 @@ function View()
 
 		if ((params === undefined) || (params === null))
 		{
-			this.errorCatcher('View Error', 1, viewName, "Inner Error");
+			__ErrorsCatcher__.catch('View Error', 1, viewName, "Inner Error");
 		} else {
 			params = params;
 		}
@@ -1450,10 +1552,8 @@ function __Core__(debug)
 {
 	var self  	   = this,					
 		OOPMethods = new OOP(this),
-		debug 	   = (debug !== undefined) ? debug:false,
 		parents    = [
 			Element,
-			ErrorsCatcher,
 			Сompiler,
 			Formatting,
 			HTMLElement,
@@ -1573,8 +1673,9 @@ function __Core__(debug)
 	}
 
 	// конструктор
-	this.__init__ = function()
+	this.__init__ = function(debug)
 	{
+		window['__debug__'] = debug;
 		this.parents   		= OOPMethods.inheritance(parents);
 		this.FramePath 		= this.getScriptPathByMatchWord("__core__.js");
 		this.config         = window["__config__"];
@@ -1602,7 +1703,7 @@ function __Core__(debug)
 		{
 			this.style.title = attKey;
 		} else {
-			this.errorCatcher('Append Method or Elems Key Error', 0, attKey, "Inner Error");
+			__ErrorsCatcher__.catch('Append Method or Elems Key Error', 0, attKey);
 		}
 	}
 
@@ -1649,10 +1750,10 @@ function __Core__(debug)
 				if (exemplar)  dict[key] = new att();
 				if (!exemplar) dict[key] = att;
 			} else {
-				this.errorCatcher('Append Method or Elems Key Error', 1, key, "Inner Error");
+				__ErrorsCatcher__.catch('Append Method or Elems Key Error', 1, key, "Inner Error");
 			}
 		}
 	}
 
-	this.__init__();
+	this.__init__((debug !== undefined) ? debug:false);
 }
