@@ -223,7 +223,8 @@ function FlipEffects(master)
 		parents    = [
 		];
 
-	this.flip_1 = {
+	this.flip_1 = 
+	{
 		event: 'click',
 
 		compile: function(elem)
@@ -256,7 +257,8 @@ function FlipEffects(master)
 		}
 	}
 
-	this.flip_2 = {
+	this.flip_2 = 
+	{
 		event: 'click',
 
 		compile: function(elem)
@@ -288,6 +290,52 @@ function DisplayEffects(master)
 		self       = this,
 		parents    = [
 		];
+ 	
+ 	this['letters showing'] =
+ 	{
+ 		event: 'click',
+
+		def: function(elem)
+		{
+			func = function(n)
+			{	
+				var n    = (n !== undefined) ? n:0,
+				    text = elem.domElement.basicContent;
+										
+				if (!text) 
+				{
+					return;
+				} else {
+					elem.domElement.innerText = text.substring(0, n);
+					if (n < text.length) setTimeout(func, 50, n+1);
+				}
+			};
+
+			return func;
+		}
+ 	}
+
+ 	this['letters disappear'] =
+ 	{
+ 		event: 'click',
+
+		def: function(elem)
+		{
+			var text = elem.domElement.innerText,
+				func = function(n)
+				{	
+					var n = (n !== undefined) ? n:0;
+
+					elem.domElement.innerText = text.substring(0, text.length-n);
+					
+					if (n < text.length) setTimeout(func, 50, n+1);
+				};
+			
+			elem.domElement.basicContent = text;
+			
+			return func;
+		}
+ 	}
 
 	this['hide panel button'] = 
 	{
@@ -309,7 +357,7 @@ function DisplayEffects(master)
 					elem.childsHidden = true;
 				} else {
 					button.setText('↽');
-					elem.showAllChildNodes();
+					elem.showAllChildNodes(button);
 
 					elem.childsHidden = false;
 				}
@@ -338,12 +386,13 @@ function DisplayEffects(master)
 		}
 	}
 
-	this['hide list'] = 
+	this['hide list 1'] = 
 	{
 		event: 'click',
 
-		def: function(elem)
+		def: function(elem, interval, funcWithHide, funcWithShow)
 		{
+			var interval = interval;
 
 			return function()
 			{
@@ -352,10 +401,10 @@ function DisplayEffects(master)
 
 				if (!hidden)
 				{
-					elem.hideAllChildNodes(elem.caption);
+					elem.hideAllChildNodesWithInterval(elem.caption, interval, funcWithHide);
 					elem.listHidden = true;
 				} else {
-					elem.showAllChildNodes(elem.caption);
+					elem.showAllChildNodesWithInterval(elem.caption, interval, funcWithShow);
 					elem.listHidden = false;
 				}
 			}
@@ -369,6 +418,40 @@ function DisplayEffects(master)
 				
 				elem.caption.connectEffect('flip_2', true);
 				elem.caption.domElement.addEventListener(this.event, this.def(elem));
+			} else {
+				__ErrorsCatcher__.catch('Effects Error', 0, ['hide list', 'caption']);
+			}
+		}
+	}
+
+	this['hide list 2'] = 
+	{
+		event: 'click',
+		compile: function(elem)
+		{	
+			if (elem.caption !== undefined) 
+			{
+				elem.caption.class = 'caption';
+				
+				elem.caption.connectEffect('flip_2', true);
+				elem.caption.domElement.addEventListener(this.event, self['hide list 1'].def(elem, 50));
+			} else {
+				__ErrorsCatcher__.catch('Effects Error', 0, ['hide list', 'caption']);
+			}
+		}
+	}
+
+	this['hide list 3'] = 
+	{
+		event: 'click',
+		compile: function(elem)
+		{	
+			if (elem.caption !== undefined) 
+			{
+				elem.caption.class = 'caption';
+				
+				elem.caption.connectEffect('flip_2', true);
+				elem.caption.domElement.addEventListener(this.event, self['hide list 1'].def(elem, 50, self['letters disappear'].def, self['letters showing'].def));
 			} else {
 				__ErrorsCatcher__.catch('Effects Error', 0, ['hide list', 'caption']);
 			}
@@ -797,16 +880,42 @@ function ElementsSetFunctions()
 		parents    = [
 		];
 
-	this.setDisplayModeForAllChildNodes = function(mode, _except)
+	this.setBusy = function(ms)
+	{
+		var st = new Date();
+
+		while ((new Date() - st) <= ms)
+		{
+		}
+
+		return ;
+	}
+
+	this.setDisplayModeForAllChildNodes = function(mode, _except, inerval, n, func)
 	{
 		var children = this.items,
-			mode     = (mode !== undefined) ? mode:'show';
+			self     = this,
+			mode     = (mode !== undefined) ? mode:'show',
+			n        = (n    !== undefined) ? n:0,
+			child    = children[n];
 
-		for (var n=0; n < children.length; n++)
+		if (child !== _except) 
 		{
-			var child = children[n];
-
-			if (child !== _except) child[mode]();
+			child[mode]();
+			if (func) (func(child))();
+		}
+			
+		if (n < children.length-1) 
+		{
+			if (inerval)
+			{
+				setTimeout(function()
+				{
+					self.setDisplayModeForAllChildNodes(mode, _except, inerval, (n+1), func);
+				}, inerval);
+			} else {
+				self.setDisplayModeForAllChildNodes(mode, _except, inerval, (n+1), func);
+			}
 		}
 	}
 
@@ -850,10 +959,20 @@ function ElementsDisplayFunctions()
 	{
 		this.domElement.style.display = this.domElement.defDisplay || 'block';
 	}
+	
+	this.hideAllChildNodesWithInterval = function(_except, interval, func)
+	{
+		this.setDisplayModeForAllChildNodes('hide', _except, interval, 0, func);
+	}
 
 	this.hideAllChildNodes = function(_except)
 	{
 		this.setDisplayModeForAllChildNodes('hide', _except);
+	}
+
+	this.showAllChildNodesWithInterval = function(_except, interval, func)
+	{
+		this.setDisplayModeForAllChildNodes('show', _except, interval, 0, func);
 	}
 
 	this.showAllChildNodes = function(_except)

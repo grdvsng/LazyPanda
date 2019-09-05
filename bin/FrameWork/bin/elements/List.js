@@ -12,7 +12,7 @@ var List = function(core, child, master)
 	this.items      = null;
 	this.content    = (child !== undefined) ? child.content:"";
 	this.effects    = [
-		'hide list'
+		'hide list 2'
 	]
 
 	this.converChildItemsToList = function(items)
