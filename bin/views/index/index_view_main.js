@@ -27,7 +27,7 @@ var index_view_main = {
 			content:  "Меню",
 
 			effects: [
-				'hide list'
+				'hide list 2'
 			],
 			
 			items: [{

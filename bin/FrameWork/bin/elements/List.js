@@ -11,9 +11,6 @@ var List = function(core, child, master)
 	this.style      = than.style.parameters[this.class];
 	this.items      = null;
 	this.content    = (child !== undefined) ? child.content:"";
-	this.effects    = [
-		'hide list 2'
-	]
 
 	this.converChildItemsToList = function(items)
 	{
