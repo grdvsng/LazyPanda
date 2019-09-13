@@ -1,125 +1,169 @@
-var __ErrorsCatcher__ = new (function ()
+var appendTaskOnStack = function(task, ms, loop)
+	{
+		window.nextTaskAfter = (window.nextTaskAfter || 0) + ms;
+
+		if (!loop)
+		{
+			setTimeout(function()
+			{
+				appendTaskOnStack(task, ms, true);
+			}, window.nextTaskAfter);
+		} else {
+			if (task) task.apply(Array(arguments).slice(3,));
+			
+			window.nextTaskAfter = 0;
+		}
+	},
+
+	__ErrorsCatcher__ = new (function ()
+	{
+		var OOPMethods = new OOP(this),
+			self       = this,
+			parents    = [
+			];
+		
+		this.__init__ = function()
+		{
+			OOPMethods.inheritance(parents);
+		}
+
+		// Внутренние ошибки.
+		this.errors = {
+			'View Error': [{
+				type:    "error",
+				message: "Can't compile view: '{0}', check your views."
+			}, {
+				type:    "error",
+				message: "Parameters for view: '{0}', not found."
+			}],
+
+			'Shedules Error': [{
+					type:    "warning",
+					message: "Shedules: '{0}', not found."
+			},  {
+					type:    "error",
+					message: "Can't run shedule: '{0}'."
+				}
+			],
+
+			'Replace Key In String By Core Variable': [{
+				type:    "warning",
+				message: "Variable: '{0}', not found in Core."
+			}],
+
+			'Background Error': [{
+				type:    "warning",
+				message: "Background: '{0}', type '{1}', not found."
+			}, {
+				type:    "warning",
+				message: "Background: '{0}', incorect object."
+			}],
+
+			'Browser Error': [{
+				type:    "warning",
+				message: "Browser not support localStorage"
+			}],
+
+			'Append Method or Elems Key Error': [{
+				type:    "warning",
+				message: "Can't find typeof: '{0}'."
+			}, {
+				type:    "warning",
+				message: "Can't find method for: '{0}'."
+			}],
+
+			'Connect Element Error': [{
+				type:    "warning",
+				message: "Can't find master for: \n'{0}'."
+			}, {
+				type:    "warning",
+				message: "Can't find effect with name: '{0}'\nfor elem: '{1}'."
+			}],
+
+			'Files Errors': [{
+				type:    "error",
+				message: "No one script match '{0}'."
+			}],
+
+			'Effects Error': [{
+				type:    "warning",
+				message: "For effect '{0}', need have element: '{1}' on super."
+			}]
+		}
+
+		this.repeatString = function(str, step)
+		{
+			var curent = "";
+
+			for (var n=0; n < step; n++)
+			{
+				curent += str;
+			}
+
+			return curent;
+		}
+		
+		this.catch = function(errorType, errorNumber, args, browseError)
+		{
+			var error       = this.errors[errorType][errorNumber],
+				body        = this.format(error.message, args),
+				line        = this.repeatString("-", body.length),
+				shablone    = "{title}\n{line}\n{body}\n{line}\nBrowser Error:\n{ge}\n{line}\n\n",
+				browseError = (browseError !== undefined) ? browseError:'Core Error',
+				ignore      = (window['__debug__'] !== undefined) ? window['__debug__']:false,
+				curMessage  = this.format(shablone, {'title': errorType, 'line': line, 'body': body, 'ge': browseError});
+				
+			if (error.type === 'warning' || ignore)
+			{
+				console.log(curMessage);
+			} else {
+				throw curMessage;
+			}
+		}
+
+		this.format = function(str, args)
+		{
+			var toFormat   = ((typeof args) !== "string") ? args:[args],
+				curentLine = str;
+
+			for (var n in toFormat)
+			{
+				var key = "\\{" + n + "\\}";
+				curentLine = curentLine.replace(new RegExp(key, 'g'), toFormat[n]);
+			}
+
+			return curentLine;
+		}
+
+		this.__init__();
+	})();
+
+
+function OOP(self)
 {
-	var OOPMethods = new OOP(this),
-		self       = this,
-		parents    = [
-		];
-	
 	this.__init__ = function()
 	{
-		OOPMethods.inheritance(parents);
+		//...
 	}
 
-	// Внутренние ошибки.
-	this.errors = {
-		'View Error': [{
-			type:    "error",
-			message: "Can't compile view: '{0}', check your views."
-		}, {
-			type:    "error",
-			message: "Parameters for view: '{0}', not found."
-		}],
-
-		'Shedules Error': [{
-				type:    "warning",
-				message: "Shedules: '{0}', not found."
-		},  {
-				type:    "error",
-				message: "Can't run shedule: '{0}'."
-			}
-		],
-
-		'Replace Key In String By Core Variable': [{
-			type:    "warning",
-			message: "Variable: '{0}', not found in Core."
-		}],
-
-		'Background Error': [{
-			type:    "warning",
-			message: "Background: '{0}', type '{1}', not found."
-		}, {
-			type:    "warning",
-			message: "Background: '{0}', incorect object."
-		}],
-
-		'Browser Error': [{
-			type:    "warning",
-			message: "Browser not support localStorage"
-		}],
-
-		'Append Method or Elems Key Error': [{
-			type:    "warning",
-			message: "Can't find typeof: '{0}'."
-		}, {
-			type:    "warning",
-			message: "Can't find method for: '{0}'."
-		}],
-
-		'Connect Element Error': [{
-			type:    "warning",
-			message: "Can't find master for: \n'{0}'."
-		}, {
-			type:    "warning",
-			message: "Can't find effect with name: '{0}'\nfor elem: '{1}'."
-		}],
-
-		'Files Errors': [{
-			type:    "error",
-			message: "No one script match '{0}'."
-		}],
-
-		'Effects Error': [{
-			type:    "warning",
-			message: "For effect '{0}', need have element: '{1}' on super."
-		}]
-	}
-
-	this.repeatString = function(str, step)
+	this.inheritance = function(parents, params)
 	{
-		var curent = "";
+		var dict = [];
 
-		for (var n=0; n < step; n++)
+		for (var n=0; n < parents.length; n++)
 		{
-			curent += str;
-		}
-
-		return curent;
-	}
-	
-	this.catch = function(errorType, errorNumber, args, browseError)
-	{
-		var error       = this.errors[errorType][errorNumber],
-			body        = this.format(error.message, args),
-			line        = this.repeatString("-", body.length),
-			shablone    = "{title}\n{line}\n{body}\n{line}\nBrowser Error:\n{ge}\n{line}\n\n",
-			browseError = (browseError !== undefined) ? browseError:'Core Error',
-			ignore      = (window['__debug__'] !== undefined) ? window['__debug__']:false,
-			curMessage  = this.format(shablone, {'title': errorType, 'line': line, 'body': body, 'ge': browseError});
+			var parent = (params !== undefined) ? new parents[n](params):new parents[n]();
 			
-		if (error.type === 'warning' || ignore)
-		{
-			console.log(curMessage);
-		} else {
-			throw curMessage;
-		}
-	}
-
-	this.format = function(str, args)
-	{
-		var toFormat   = ((typeof args) !== "string") ? args:[args],
-			curentLine = str;
-
-		for (var n in toFormat)
-		{
-			var key = "\\{" + n + "\\}";
-			curentLine = curentLine.replace(new RegExp(key, 'g'), toFormat[n]);
+			dict[parent.name] = parent;
+			
+			for (var att in parent) self[att] = parent[att];
 		}
 
-		return curentLine;
+		return dict;
 	}
 
 	this.__init__();
-})();
+}
 
 
 function __LocalStorage__()
@@ -160,33 +204,6 @@ function __LocalStorage__()
 		} catch(e) {
 			this.onError(e);
 		}
-	}
-
-	this.__init__();
-}
-
-
-function OOP(self)
-{
-	this.__init__ = function()
-	{
-		//...
-	}
-
-	this.inheritance = function(parents, params)
-	{
-		var dict = [];
-
-		for (var n=0; n < parents.length; n++)
-		{
-			var parent = (params !== undefined) ? new parents[n](params):new parents[n]();
-			
-			dict[parent.name] = parent;
-			
-			for (var att in parent) self[att] = parent[att];
-		}
-
-		return dict;
 	}
 
 	this.__init__();
@@ -291,52 +308,6 @@ function DisplayEffects(master)
 		parents    = [
 		];
  	
- 	this['letters showing'] =
- 	{
- 		event: 'click',
-
-		def: function(elem)
-		{
-			func = function(n)
-			{	
-				var n    = (n !== undefined) ? n:0,
-				    text = elem.domElement.basicContent;
-										
-				if (!text) 
-				{
-					return;
-				} else {
-					elem.domElement.innerText = text.substring(0, n);
-					if (n < text.length) setTimeout(func, 50, n+1);
-				}
-			};
-
-			return func;
-		}
- 	}
-
- 	this['letters disappear'] =
- 	{
- 		event: 'click',
-
-		def: function(elem)
-		{
-			var text = elem.domElement.innerText,
-				func = function(n)
-				{	
-					var n = (n !== undefined) ? n:0;
-
-					elem.domElement.innerText = text.substring(0, text.length-n);
-					
-					if (n < text.length) setTimeout(func, 50, n+1);
-				};
-			
-			elem.domElement.basicContent = text;
-			
-			return func;
-		}
- 	}
-
 	this['hide panel button'] = 
 	{
 		event: 'click',
@@ -398,10 +369,11 @@ function DisplayEffects(master)
 			{
 				var children = elem.domElement.childNodes,
 					hidden   = elem.listHidden || false;
-
+				
 				if (!hidden)
 				{
 					elem.hideAllChildNodesWithInterval(elem.caption, interval, funcWithHide);
+
 					elem.listHidden = true;
 				} else {
 					elem.showAllChildNodesWithInterval(elem.caption, interval, funcWithShow);
@@ -415,10 +387,15 @@ function DisplayEffects(master)
 			if (elem.caption !== undefined) 
 			{
 				elem.caption.class = 'caption';
-				
+
 				elem.caption.connectEffect('flip_2', true);
-				elem.caption.domElement.addEventListener(this.event, this.def(elem));
-			} else {
+				elem.caption.domElement.addEventListener(
+					this.event, 
+					this.def(elem, 25, 
+						function() {this.setFilter('blur(1px)');},
+						function() {this.setFilter('none');}
+				));
+			} else { 
 				__ErrorsCatcher__.catch('Effects Error', 0, ['hide list', 'caption']);
 			}
 		}
@@ -707,7 +684,7 @@ function ElementsMetamorphosesFunctions()
 		self       = this,
 		parents    = [
 		];
-	
+
 	this.changeHTMLElementTag = function(newTag)
 	{
 		self.changeHTMLElementTag(this, newTag);
@@ -807,6 +784,14 @@ function ElementsGetFunctions()
 		}
 	}
 
+	this.getDefaultStyleParameter = function(key)
+	{
+		var style = this.compile_parameters.style,
+			value = (style !== undefined) ? style[key]:'none';
+
+		return (value !== undefined) ? value:'none';
+ 	}
+
 	this.getStyleAttribute = function(att)
 	{
 		var style = window.getComputedStyle(this.domElement),
@@ -879,43 +864,53 @@ function ElementsSetFunctions()
 		self       = this,
 		parents    = [
 		];
-
-	this.setBusy = function(ms)
+	
+	this.setSelectedChild = function(method, params)
 	{
-		var st = new Date();
+		var args  = (Array.isArray()) ? params:[params],
+			child = this.selectedChild;
 
-		while ((new Date() - st) <= ms)
+		if (child) child[method].apply(child, args);
+	}
+	
+	this.setFilter  = function(val)
+	{
+		this.domElement.style.filter                   = val;
+ 		this.domElement.style.filter['-webkit-filter'] = val;
+	}
+	
+	this.setDisplayModeForChild = function(child, mode, interval, effectBeforeHide, effectAfterHide, effectBeforeShow, effectAfterShow)
+	{
+		var mode         = (mode !== undefined) ? mode:'show',
+			self         = this,
+			effectBefore = (mode !== 'show') ? effectBeforeHide:effectBeforeShow,
+			effectAfter  = (mode !== 'show') ? effectAfterHide:effectAfterShow;
+
+		if (effectBefore) {effectBefore.apply(child);}
+		if (interval) 
 		{
+			appendTaskOnStack(function()
+			{
+				self.setDisplayModeForChild(child, mode, undefined, effectBeforeHide, effectAfterHide, effectBeforeShow, effectAfterShow);
+			}, interval);
+		} else {
+			child[mode]();
 		}
 
-		return ;
+		if (effectAfter) effectAfter.apply(child);
 	}
 
-	this.setDisplayModeForAllChildNodes = function(mode, _except, inerval, n, func)
+	this.setDisplayModeForAllChildNodes = function(mode, _except, inerval, func)
 	{
 		var children = this.items,
-			self     = this,
-			mode     = (mode !== undefined) ? mode:'show',
-			n        = (n    !== undefined) ? n:0,
-			child    = children[n];
+			self     = this;
 
-		if (child !== _except) 
+		for (var n=0; n < children.length; n++)
 		{
-			child[mode]();
-			if (func) (func(child))();
-		}
-			
-		if (n < children.length-1) 
-		{
-			if (inerval)
-			{
-				setTimeout(function()
-				{
-					self.setDisplayModeForAllChildNodes(mode, _except, inerval, (n+1), func);
-				}, inerval);
-			} else {
-				self.setDisplayModeForAllChildNodes(mode, _except, inerval, (n+1), func);
-			}
+			var child          = children[n];
+			this.selectedChild = child;
+
+			if (child !== _except) self.setDisplayModeForChild(child, mode, inerval, func, undefined, undefined, func);
 		}
 	}
 
@@ -962,22 +957,22 @@ function ElementsDisplayFunctions()
 	
 	this.hideAllChildNodesWithInterval = function(_except, interval, func)
 	{
-		this.setDisplayModeForAllChildNodes('hide', _except, interval, 0, func);
+		this.setDisplayModeForAllChildNodes('hide', _except, interval, func);
 	}
 
-	this.hideAllChildNodes = function(_except)
+	this.hideAllChildNodes = function(_except, func)
 	{
-		this.setDisplayModeForAllChildNodes('hide', _except);
+		this.setDisplayModeForAllChildNodes('hide', _except, 0, func);
 	}
 
 	this.showAllChildNodesWithInterval = function(_except, interval, func)
 	{
-		this.setDisplayModeForAllChildNodes('show', _except, interval, 0, func);
+		this.setDisplayModeForAllChildNodes('show', _except, interval, func);
 	}
 
-	this.showAllChildNodes = function(_except)
+	this.showAllChildNodes = function(_except, func)
 	{
-		this.setDisplayModeForAllChildNodes('show', _except);
+		this.setDisplayModeForAllChildNodes('show', _except, 0, func);
 	}
 
 	OOPMethods.inheritance(parents);
