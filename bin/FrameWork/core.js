@@ -314,8 +314,6 @@ function DisplayEffects(master)
 
 		def: function(elem, button)
 		{
-			var size = elem.getSize(true);
-
 			return function()
 			{	
 				var hidden = (elem.childsHidden !== undefined) ? elem.childsHidden:false;
@@ -323,10 +321,11 @@ function DisplayEffects(master)
 				if (!hidden) 
 				{
 					button.setText('⇀');
+					elem.smoothRetraction.apply(elem, button);
 					elem.hideAllChildNodes(button);
-
 					elem.childsHidden = true;
 				} else {
+					elem.smoothTraction.apply(elem, button);
 					button.setText('↽');
 					elem.showAllChildNodes(button);
 
@@ -756,8 +755,15 @@ function ElementsGetFunctions()
 {
 	var OOPMethods = new OOP(this),
 		self       = this,
-		parents    = [
-		];
+		parents    = [];
+
+	this.defPosition = 
+	{
+		'0': 	 'top',
+		'1': 	 'left',
+		'2': 	 'right',
+		'3':     'bottom'
+	};
 
 	this.__del__ = function()
 	{
@@ -771,9 +777,9 @@ function ElementsGetFunctions()
 
 	this.removeChildren = function()
 	{
-		for (var n=0; n < this.domElement.childNodes.length; n++)
+		for (var n=0; n < this.items.length; n++)
 		{
-			var child = this.domElement.childNodes[n];
+			var child = this.items[n];
 
 			try {
 				child.super.__del__();
@@ -782,6 +788,8 @@ function ElementsGetFunctions()
 				child.parentNode.removeChild(child);
 			}
 		}
+
+		this.items = [];
 	}
 
 	this.getDefaultStyleParameter = function(key)
@@ -916,12 +924,16 @@ function ElementsSetFunctions()
 
 	this.setHeight = function(val)
 	{
-		this.domElement.style.height = val;
+		var value = ((typeof val) === 'number') ? (val + 'px'):val;
+
+		this.domElement.style.height = value;
 	}
 	
 	this.setWidth = function(val)
 	{
-		this.domElement.style.width = val;
+		var value = ((typeof val) === 'number') ? (val + 'px'):val;
+		
+		this.domElement.style.width = value;
 	}
 
 	this.setColorFilter = function(type, precent, byString)
@@ -943,6 +955,37 @@ function ElementsDisplayFunctions()
 		parents    = [
 			ElementsSetFunctions
 		];
+
+	this.smoothRetraction = function(until)
+	{
+		var self       = this,
+			viaWidth   = this.getWidth() > this.getHeight(),
+			definition = (viaWidth) ? function(val){self.setHeight(val)}:function(val){self.setWidth(val)},
+			getLength  = (viaWidth) ? function(){return self.getHeight()}:function(){return self.getWidth()},
+			until      = (until !== undefined) ? ((viaWidth) ? until.getHeight():until.getWidth()):0,
+			length     = getLength();
+	
+		this.sizeBeforeSmoothRetraction = this.getSize();
+		definition(length);
+
+		while (length > until)
+		{
+			length = getLength();
+			
+			appendTaskOnStack(function(){definition(length - 1)}, 100);
+		}
+	}
+
+	this.smoothTraction = function()
+	{
+		var self       = this,
+			viaWidth   = this.getWidth() > this.getHeight(),
+			definition = (viaWidth) ? function(val){return self.setHeight(val)}:function(val){return self.setWidth(val)},
+			getLength  = (viaWidth) ? function(val){return self.getHeight(val)}:function(val){return self.getWidth(val)},
+			length     = getLength();
+	
+		this.sizeBeforeSmoothRetraction = this.getSize();
+	}
 
 	this.hide = function()
 	{
