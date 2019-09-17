@@ -10,15 +10,15 @@ var MenuPanel = function(core, child, master)
 	this.type       = "innerElement";
 	this.position   = (child.position  === undefined) ? 0:child.position;
 	this.positions  = [{
-			top:         '0%',
-			left:        '0%',
-			right:       '0%',
+			top:         '0px',
+			left:        '0px',
+			right:       '0px',
 			width:       '100%'
 		}, {
 			style: 
 			{
-				top:     '0%',
-				left:    '0%',
+				top:     '0px',
+				left:    '0px',
 				height:  '100%'
 			},
 
@@ -27,15 +27,15 @@ var MenuPanel = function(core, child, master)
 				self.makeLineBetweenChildNodes();
 			}
 		}, {
-			bottom:     '0%',
-			left:       '0%',
-			right:      '0%',
+			bottom:     '0px',
+			left:       '0px',
+			right:      '0px',
 			width:      '100%'	
 		}, {
 			style: 
 			{
-				top:    '0%',
-				right:  '0%',
+				top:    '0px',
+				right:  '0px',
 				height: '100%'
 			},
 

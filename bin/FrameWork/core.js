@@ -1,15 +1,27 @@
-var appendTaskOnStack = function(task, ms, loop)
+var argumentsToArray = function(args)
 	{
-		window.nextTaskAfter = (window.nextTaskAfter || 0) + ms;
+		var curArray = [];
 
+		for (n=0; n < args.length; n++) curArray.push(args[n]);
+
+		return curArray;
+	},
+
+	appendTaskOnStack = function(task, ms, loop)
+	{
+		var args             = argumentsToArray(arguments);
+		window.nextTaskAfter = (window.nextTaskAfter || 0) + ms;
+		
 		if (!loop)
 		{
 			setTimeout(function()
 			{
-				appendTaskOnStack(task, ms, true);
+				appendTaskOnStack(task, ms, true, ((args.length > 2) ? args.slice(3,args.length):undefined));
+
 			}, window.nextTaskAfter);
 		} else {
-			if (task) task.apply(Array(arguments).slice(3,));
+			console.log(args)
+			if (task) task.apply(null, arguments[3]);
 			
 			window.nextTaskAfter = 0;
 		}
@@ -320,16 +332,26 @@ function DisplayEffects(master)
 
 				if (!hidden) 
 				{
-					button.setText('⇀');
-					elem.smoothRetraction.apply(elem, button);
+					elem.smoothRetraction.apply(elem, 
+					[
+						button,
+						function()
+						{
+							button.setText('⇀');
+							elem.childsHidden = true;
+						}
+					]);
 					elem.hideAllChildNodes(button);
-					elem.childsHidden = true;
 				} else {
-					elem.smoothTraction.apply(elem, button);
-					button.setText('↽');
-					elem.showAllChildNodes(button);
-
-					elem.childsHidden = false;
+					elem.unRetraction.apply(elem, 
+					[
+						function()
+						{
+							elem.showAllChildNodes(button);
+							button.setText('↽');
+							elem.childsHidden = false;
+						}
+					]);
 				}
 			}
 		},
@@ -956,35 +978,47 @@ function ElementsDisplayFunctions()
 			ElementsSetFunctions
 		];
 
-	this.smoothRetraction = function(until)
+	this.smoothRetraction = function(objectWithMaxValue, afterFunction)
 	{
-		var self       = this,
-			viaWidth   = this.getWidth() > this.getHeight(),
-			definition = (viaWidth) ? function(val){self.setHeight(val)}:function(val){self.setWidth(val)},
-			getLength  = (viaWidth) ? function(){return self.getHeight()}:function(){return self.getWidth()},
-			until      = (until !== undefined) ? ((viaWidth) ? until.getHeight():until.getWidth()):0,
-			length     = getLength();
-	
-		this.sizeBeforeSmoothRetraction = this.getSize();
-		definition(length);
+		var self          = this,
+			viaWidth      = this.getWidth() > this.getHeight(),
+			definition    = (viaWidth) ? function(val){self.setHeight(val)}:function(val){self.setWidth(val)},
+			getLength     = (viaWidth) ? function(){return self.getHeight()}:function(){return self.getWidth()},
+			length        = getLength();
+			limit         = length - ((objectWithMaxValue !== undefined) ? ((viaWidth) ? objectWithMaxValue.getHeight():objectWithMaxValue.getWidth()):0),
+			interval      = 0;
+		
+		this.lastSmoothRetraction = {'size':  getLength(), 'mode':  viaWidth};
 
-		while (length > until)
+		definition(length);
+		for (n=0; n < limit; n++)
 		{
-			length = getLength();
-			
-			appendTaskOnStack(function(){definition(length - 1)}, 100);
+			interval +=5 ;
+			setTimeout(definition, interval, (length - n));
 		}
+
+		if (afterFunction) setTimeout(afterFunction, interval);
 	}
 
-	this.smoothTraction = function()
+	this.unRetraction = function(afterFunction)
 	{
+		if (this.lastSmoothRetraction === undefined) return;
+
 		var self       = this,
-			viaWidth   = this.getWidth() > this.getHeight(),
-			definition = (viaWidth) ? function(val){return self.setHeight(val)}:function(val){return self.setWidth(val)},
-			getLength  = (viaWidth) ? function(val){return self.getHeight(val)}:function(val){return self.getWidth(val)},
-			length     = getLength();
-	
-		this.sizeBeforeSmoothRetraction = this.getSize();
+			viaWidth   = !this.lastSmoothRetraction.mode,
+			n          = (viaWidth) ? this.getWidth(false):this.getHeight(false),
+			definition = (!viaWidth) ? function(val){self.setHeight(val)}:function(val){self.setWidth(val)},
+			length     = this.lastSmoothRetraction.size,
+			interval   = 0;
+
+		for (n; n < length; n++)
+		{
+			interval += 5;
+			setTimeout(definition, interval, n);
+		} 
+		
+		if (afterFunction) setTimeout(afterFunction, interval);
+		this.lastSmoothRetraction = undefined;
 	}
 
 	this.hide = function()
