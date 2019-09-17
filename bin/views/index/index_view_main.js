@@ -41,7 +41,17 @@ var index_view_main = {
 			}, {
 				type:    "innerElement",
 				class:   "MenuButton",
-				content: "Войти"
+				content: "Войти",
+				events:[{
+					event:  'click',
+					action: function() 
+					{
+						console.log("click.");
+					}
+				}, {
+					event:  'dblclick',
+					action: 'console.log("dblclick..")'
+				}]
 			}]
 		}]
 	}]

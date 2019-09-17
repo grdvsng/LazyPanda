@@ -1,4 +1,19 @@
-var argumentsToArray = function(args)
+
+
+var addeventlistener = function(HTMLElement, event, action)
+	{
+		if ((typeof action) !== 'string')
+		{
+			if (HTMLElement.addEventListener)
+			{
+				HTMLElement.addEventListener(event, action);
+			} else {HTMLElement.attachEvent(event, action);}
+		} else {
+			HTMLElement['on' + event] = function(){eval(action)};
+		}
+	},
+
+	argumentsToArray = function(args)
 	{
 		var curArray = [];
 
@@ -20,7 +35,6 @@ var argumentsToArray = function(args)
 
 			}, window.nextTaskAfter);
 		} else {
-			console.log(args)
 			if (task) task.apply(null, arguments[3]);
 			
 			window.nextTaskAfter = 0;
@@ -538,7 +552,7 @@ function ElementsConnectFunctions()
 			this.connectEffect(effects[n], forAllChilds);
 		}
 	}
-
+	
 	this.connectEffect = function(effectName, forAllChilds)
 	{
 		var effect       = new UIEffects()[effectName],
@@ -594,6 +608,16 @@ function Element()
 	this.__init__ = function()
 	{
 		OOPMethods.inheritance(parents);
+	}
+
+	this.connectEvents = function(HTMLElement, events)
+	{
+		for (var n=0; n < events.length; n++)
+		{
+			var params = events[n];
+			
+			addeventlistener(HTMLElement, params.event, params.action);
+		}
 	}
 
 	this.createNotTuchLable = function(master, style, content)
@@ -993,7 +1017,7 @@ function ElementsDisplayFunctions()
 		definition(length);
 		for (n=0; n < limit; n++)
 		{
-			interval +=5 ;
+			interval += 4;
 			setTimeout(definition, interval, (length - n));
 		}
 
@@ -1013,7 +1037,7 @@ function ElementsDisplayFunctions()
 
 		for (n; n < length; n++)
 		{
-			interval += 5;
+			interval += 4;
 			setTimeout(definition, interval, n);
 		} 
 		
@@ -1220,8 +1244,9 @@ function Сompiler()
 		}
 
 		this.elementStyleCompile(HTMLElement.style, innerElement.style);
-		this.objectAddition(HTMLElement, innerElement.events);
 		this.generateDictWithIdAndClassAttributs(innerElement, HTMLElement);
+		
+		if (innerElement.events) this.connectEvents(HTMLElement, innerElement.events);
 
 		return HTMLElement;
 	}
