@@ -15,7 +15,7 @@ var default_style = {
 	{
 		'DefaultView': 
 		{
-			'background': 'url({FramePath}/bin/styles/shaders/default.svg) no-repeat bottom center fixed',
+			'background': 'url({FramePath}/bin/styles/shaders/default.svg) no-repeat bottom center fixed'
 		},
 
 		'FlexMenu':

@@ -60,7 +60,6 @@ var MenuPanel = function(core, child, master)
 		} 
 		
 		than.objectAddition(self.domElement.style, pos);
-		
 	}
 
 	this.onRender = function()

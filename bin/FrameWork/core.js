@@ -1,168 +1,44 @@
-
-
-var addeventlistener = function(HTMLElement, event, action)
+function addeventlistener(HTMLElement, event, action)
+{
+	if ((typeof action) !== 'string')
 	{
-		if ((typeof action) !== 'string')
+		if (HTMLElement.addEventListener)
 		{
-			if (HTMLElement.addEventListener)
-			{
-				HTMLElement.addEventListener(event, action);
-			} else {HTMLElement.attachEvent(event, action);}
-		} else {
-			HTMLElement['on' + event] = function(){eval(action)};
-		}
-	},
+			HTMLElement.addEventListener(event, action);
+		} else {HTMLElement.attachEvent(event, action);}
+	} else {
+		HTMLElement['on' + event] = function(){eval(action)};
+	}
+}
 
-	argumentsToArray = function(args)
+
+function argumentsToArray(args)
+{
+	var curArray = [];
+
+	for (n=0; n < args.length; n++) curArray.push(args[n]);
+
+	return curArray;
+}
+
+function appendTaskOnStack (task, ms, loop)
+{
+	var args             = argumentsToArray(arguments);
+	window.nextTaskAfter = (window.nextTaskAfter || 0) + ms;
+	
+	if (!loop)
 	{
-		var curArray = [];
+		setTimeout(function()
+		{
+			appendTaskOnStack(task, ms, true, ((args.length > 2) ? args.slice(3,args.length):undefined));
 
-		for (n=0; n < args.length; n++) curArray.push(args[n]);
-
-		return curArray;
-	},
-
-	appendTaskOnStack = function(task, ms, loop)
-	{
-		var args             = argumentsToArray(arguments);
-		window.nextTaskAfter = (window.nextTaskAfter || 0) + ms;
+		}, window.nextTaskAfter);
+	} else {
+		if (task) task.apply(null, arguments[3]);
 		
-		if (!loop)
-		{
-			setTimeout(function()
-			{
-				appendTaskOnStack(task, ms, true, ((args.length > 2) ? args.slice(3,args.length):undefined));
-
-			}, window.nextTaskAfter);
-		} else {
-			if (task) task.apply(null, arguments[3]);
-			
-			window.nextTaskAfter = 0;
-		}
-	},
-
-	__ErrorsCatcher__ = new (function ()
-	{
-		var OOPMethods = new OOP(this),
-			self       = this,
-			parents    = [
-			];
-		
-		this.__init__ = function()
-		{
-			OOPMethods.inheritance(parents);
-		}
-
-		// Внутренние ошибки.
-		this.errors = {
-			'View Error': [{
-				type:    "error",
-				message: "Can't compile view: '{0}', check your views."
-			}, {
-				type:    "error",
-				message: "Parameters for view: '{0}', not found."
-			}],
-
-			'Shedules Error': [{
-					type:    "warning",
-					message: "Shedules: '{0}', not found."
-			},  {
-					type:    "error",
-					message: "Can't run shedule: '{0}'."
-				}
-			],
-
-			'Replace Key In String By Core Variable': [{
-				type:    "warning",
-				message: "Variable: '{0}', not found in Core."
-			}],
-
-			'Background Error': [{
-				type:    "warning",
-				message: "Background: '{0}', type '{1}', not found."
-			}, {
-				type:    "warning",
-				message: "Background: '{0}', incorect object."
-			}],
-
-			'Browser Error': [{
-				type:    "warning",
-				message: "Browser not support localStorage"
-			}],
-
-			'Append Method or Elems Key Error': [{
-				type:    "warning",
-				message: "Can't find typeof: '{0}'."
-			}, {
-				type:    "warning",
-				message: "Can't find method for: '{0}'."
-			}],
-
-			'Connect Element Error': [{
-				type:    "warning",
-				message: "Can't find master for: \n'{0}'."
-			}, {
-				type:    "warning",
-				message: "Can't find effect with name: '{0}'\nfor elem: '{1}'."
-			}],
-
-			'Files Errors': [{
-				type:    "error",
-				message: "No one script match '{0}'."
-			}],
-
-			'Effects Error': [{
-				type:    "warning",
-				message: "For effect '{0}', need have element: '{1}' on super."
-			}]
-		}
-
-		this.repeatString = function(str, step)
-		{
-			var curent = "";
-
-			for (var n=0; n < step; n++)
-			{
-				curent += str;
-			}
-
-			return curent;
-		}
-		
-		this.catch = function(errorType, errorNumber, args, browseError)
-		{
-			var error       = this.errors[errorType][errorNumber],
-				body        = this.format(error.message, args),
-				line        = this.repeatString("-", body.length),
-				shablone    = "{title}\n{line}\n{body}\n{line}\nBrowser Error:\n{ge}\n{line}\n\n",
-				browseError = (browseError !== undefined) ? browseError:'Core Error',
-				ignore      = (window['__debug__'] !== undefined) ? window['__debug__']:false,
-				curMessage  = this.format(shablone, {'title': errorType, 'line': line, 'body': body, 'ge': browseError});
-				
-			if (error.type === 'warning' || ignore)
-			{
-				console.log(curMessage);
-			} else {
-				throw curMessage;
-			}
-		}
-
-		this.format = function(str, args)
-		{
-			var toFormat   = ((typeof args) !== "string") ? args:[args],
-				curentLine = str;
-
-			for (var n in toFormat)
-			{
-				var key = "\\{" + n + "\\}";
-				curentLine = curentLine.replace(new RegExp(key, 'g'), toFormat[n]);
-			}
-
-			return curentLine;
-		}
-
-		this.__init__();
-	})();
+		window.nextTaskAfter = 0;
+	}
+}
 
 
 function OOP(self)
@@ -338,36 +214,41 @@ function DisplayEffects(master)
 	{
 		event: 'click',
 
-		def: function(elem, button)
+		action: function(elem, button)
 		{
 			return function()
-			{	
-				var hidden = (elem.childsHidden !== undefined) ? elem.childsHidden:false;
+			{
+				var hidden = elem.childsHidden || false;
 
 				if (!hidden) 
 				{
-					elem.smoothRetraction.apply(elem, 
-					[
-						button,
-						function()
-						{
-							button.setText('⇀');
-							elem.childsHidden = true;
-						}
-					]);
+					elem.setAttributeForAllChild('style.color', 'red')
+					/*elem.smoothRetraction.apply(elem, [button, function() {
+						button.setText(button.hidenButton);
+						elem.childsHidden = true;
+					}]);
+
 					elem.hideAllChildNodes(button);
+					*/
 				} else {
-					elem.unRetraction.apply(elem, 
-					[
-						function()
-						{
-							elem.showAllChildNodes(button);
-							button.setText('↽');
-							elem.childsHidden = false;
-						}
-					]);
+					elem.unRetraction.apply(elem, [function()
+					{
+						elem.showAllChildNodes(button);
+						button.setText(button.showButton);
+						elem.childsHidden = false;
+					}]);
 				}
 			}
+		},
+
+		def: function(elem, button)
+		{
+			button.hidenButton = (elem.position !== 3) ? '⇀':'↽';
+			button.showButton  = (elem.position !== 3) ? '↽':'⇀';
+
+			button.setText(button.showButton);
+
+			return this.action(elem, button);
 		},
 
 		compile: function(elem)
@@ -585,7 +466,6 @@ function ElementsDefaultFunction()
 		self       = this,
 		parents    = [
 			ElementsGetFunctions,
-			ElementsRemoveFunctions,
 			ElementsMetamorphosesFunctions,
 			ElementsDisplayFunctions,
 			ElementsSetFunctions,
@@ -801,41 +681,28 @@ function ElementsGetFunctions()
 {
 	var OOPMethods = new OOP(this),
 		self       = this,
-		parents    = [];
+		parents    = [
+			ElementsRemoveFunctions
+		];
 
-	this.defPosition = 
+	this.getAttributeByRoutes = function(elem, routes)
 	{
-		'0': 	 'top',
-		'1': 	 'left',
-		'2': 	 'right',
-		'3':     'bottom'
-	};
-
-	this.__del__ = function()
-	{
-		this.removeChildren();
-		this.domElement.parentNode.removeChild(this.domElement);
-
-		for (var att in this) delete this[att];
-
-		//self.masterUpdateObjectsList(); нужно сделать
+		if (routes.length >= 1) 
+		{
+			return this.getAttributeByRoutes(elem[routes[0]], routes.slice(1));
+		} 
+			
+		return elem;
 	}
 
-	this.removeChildren = function()
+	this.getAttributeByPath = function(path, forDomElement)
 	{
-		for (var n=0; n < this.items.length; n++)
-		{
-			var child = this.items[n];
-
-			try {
-				child.super.__del__();
-			} catch(e) {
-				child.innerHTML = "";
-				child.parentNode.removeChild(child);
-			}
-		}
-
-		this.items = [];
+		var forDomElement = forDomElement || false,
+			elem          = (forDomElement) ? this.domElement:this,
+			routes        = path.split(/[.\/\\]/g);
+		
+		try      { return this.getAttributeByRoutes(elem, routes);} 
+		catch(e) { return __ErrorsCatcher__.catch('Element Get Function Error', 0, path, e);}
 	}
 
 	this.getDefaultStyleParameter = function(key)
@@ -919,6 +786,28 @@ function ElementsSetFunctions()
 		parents    = [
 		];
 	
+	this.setAttributeForAllChild = function(attribute, value)
+	{
+		var children = children = this.items;
+
+		for (var n=0; n < children.length; n++)
+		{
+			var child = children[n];
+
+			if (child.items) child.setAttributeForAllChild(attribute, value);
+
+			child.setAttribute(attribute, value);
+		}
+	}
+	
+	this.setAttribute = function(attribute, value, forDomElement)
+	{
+		var forDomElement = forDomElement || true,
+			att           = this.getAttributeByPath(attribute, forDomElement);
+
+		att = value;
+	}
+
 	this.setSelectedChild = function(method, params)
 	{
 		var args  = (Array.isArray()) ? params:[params],
@@ -1087,29 +976,34 @@ function ElementsRemoveFunctions()
 		parents    = [
 		];
 
+
 	this.__del__ = function()
 	{
+		this.domElement.__del__();
 		this.removeChildren();
-		this.domElement.parentNode.removeChild(this.domElement);
 
-		for (var att in this) delete this[att];
-
-		//self.masterUpdateObjectsList(); нужно сделать
+		this.core.objects = this.core.objects.filter(function(el){return !el.deleted});
 	}
 
-	this.removeChildren = function()
+	this.removeItem = function(item)
 	{
-		for (var n=0; n < this.domElement.childNodes.length; n++)
+		this.items = this.items.filter(function (el) 
 		{
-			var child = this.domElement.childNodes[n];
+			return el != null && el !== item && !el.deleted;
+		});
 
-			try {
-				child.super.__del__();
-			} catch(e) {
-				child.innerHTML = "";
-				child.parentNode.removeChild(child);
-			}
-		}
+		return this.items;
+	}
+	
+	this.removeChildren = function(n)
+	{
+		var n     = (n !== undefined) ? n:0,
+			child = this.items[n];
+
+		if (child) child.__del__();
+
+		if (n < this.items.length) {this.removeChildren(n+1);} 
+		else                       {this.items = [];}
 	}
 
 	OOPMethods.inheritance(parents);
@@ -1122,7 +1016,8 @@ function Сompiler()
 		self       = this,
 		parents    = [
 			Obj,
-			Formatting
+			Formatting,
+			HTMLElement
 		];
 
 	this.__init__ = function()
@@ -1219,9 +1114,9 @@ function Сompiler()
 			elemType   = (label.position !== 'top' && label.position !== 'bottom') ? 'td':'tr',
 			elem       = document.createElement(elemType);
 		
-		label.style      = this.objectAddition(el.style.label, label.style);
-		label.content    = label.content;
-		label.domElement = this.connectInnerAttsToHTMLObject(label, elem, el);
+		label.style           = this.objectAddition(el.style.label, label.style);
+		label.content         = label.content;
+		label.domElement      = this.connectInnerAttsToHTMLObject(label, elem, el);
 		
 		if (label.position === 'left' || label.position === 'top')   
 		{
@@ -1233,10 +1128,21 @@ function Сompiler()
 		return label;
 	}
 
+	this.connectMethodsForHTMLProto = function(elem)
+	{
+		for (var n=0; n < this.HTMLmethods.length; n++)
+		{
+			var att    = this.HTMLmethods[n]['title'],
+				action = this.HTMLmethods[n]['action'];
+
+			elem.__proto__[att] = action;
+		}
+	}
+
 	this.connectInnerAttsToHTMLObject = function(innerElement, HTMLElement, paramsForElement)
 	{
 		var title = (HTMLElement.title !== undefined) ? HTMLElement.title:innerElement.compile_parameters.title;
-
+		
 		if (innerElement.content !== undefined) 
 		{
 			HTMLElement.innerHTML += "<div>" + innerElement.content.trim() +  "</div>";
@@ -1245,7 +1151,8 @@ function Сompiler()
 
 		this.elementStyleCompile(HTMLElement.style, innerElement.style);
 		this.generateDictWithIdAndClassAttributs(innerElement, HTMLElement);
-		
+		this.connectMethodsForHTMLProto(HTMLElement);
+
 		if (innerElement.events) this.connectEvents(HTMLElement, innerElement.events);
 
 		return HTMLElement;
@@ -1256,6 +1163,7 @@ function Сompiler()
 		compiled.compile_parameters = el;
 		compiled.core               = this;
 		compiled.domElement.super   = compiled;
+		compiled.items              = compiled.items || [];
 
 		this.objectAddition(compiled, new ElementsDefaultFunction());
 		
@@ -1408,8 +1316,28 @@ function HTMLElement()
 		self       = this,
 		parents    = [
 			PathParser
-	];
-	
+		];
+
+
+	this.HTMLmethods  = [{
+		'title': '__del__',
+		'action': function()
+		{
+			var self   = this,
+				master = this.super.master;
+
+			this.super.deleted = true;
+			master.items       = this.super.master.items.filter(function(el)
+			{
+				return !el.deleted && !master.deleted;
+			});
+
+			(this.remove) ? this.remove():this.parentNode.removeChild(this);
+
+			delete this;
+		}
+	}]
+
 	this.__init__ = function()
 	{
 		OOPMethods.inheritance(parents);
@@ -1511,6 +1439,18 @@ function Obj()
  		if (remDup) arr1 = this.removeDuplicate(arr1, arr2);
  		
  		return arr1;
+ 	}
+
+ 	this.deleteElementFromArray = function(arr, value)
+ 	{
+ 		var curArry = [];
+
+ 		for (var n=0; arr.length; n++)
+ 		{
+ 			if (arr[n] !== value) curArry.push(Arr[n]);
+ 		}
+		
+ 		return curArry;
  	}
 
  	// Слияние объектов.
@@ -1764,6 +1704,21 @@ function Win()
 }
 
 
+// Реакция на специальные событий;
+function CoreEvents()
+{
+	var self  	   = this,					
+		OOPMethods = new OOP(this),
+		parents    = [
+		]
+
+	this.__init__ = function(debug)
+	{
+		this.parents = OOPMethods.inheritance(parents);
+	}
+}
+
+
 function __Core__(debug)
 {
 	var self  	   = this,					
@@ -1772,13 +1727,13 @@ function __Core__(debug)
 			Element,
 			Сompiler,
 			Formatting,
-			HTMLElement,
 			Obj,
 			PathParser,
 			Sheduler,
 			__LocalStorage__,
 			View,
-			Win
+			Win,
+			CoreEvents
 		];
 	
 	// Задания.
@@ -1891,15 +1846,17 @@ function __Core__(debug)
 	// конструктор
 	this.__init__ = function(debug)
 	{
+		var than = this;
+
 		window['__debug__'] = debug;
 		this.parents   		= OOPMethods.inheritance(parents);
 		this.FramePath 		= this.getScriptPathByMatchWord("__core__.js");
 		this.config         = window["__config__"];
 		window['FramePath'] = this.FramePath;
 		
-		this.start_schedules('onLoad'); 
+		this.start_schedules('onLoad');
 	}
-	
+
 	// Добавления подключаемых элементов к движку.
 	this.appendMethodOrElemKey = function(path, attKey)
 	{
@@ -1973,3 +1930,132 @@ function __Core__(debug)
 
 	this.__init__((debug !== undefined) ? debug:false);
 }
+
+
+var	__ErrorsCatcher__ = new (function ()
+	{
+		var OOPMethods = new OOP(this),
+			self       = this,
+			parents    = [
+			];
+		
+		this.__init__ = function()
+		{
+			OOPMethods.inheritance(parents);
+		}
+
+		// Внутренние ошибки.
+		this.errors = {
+			'View Error': [{
+				type:    "error",
+				message: "Can't compile view: '{0}', check your views."
+			}, {
+				type:    "error",
+				message: "Parameters for view: '{0}', not found."
+			}],
+
+			'Shedules Error': [{
+					type:    "warning",
+					message: "Shedules: '{0}', not found."
+			},  {
+					type:    "error",
+					message: "Can't run shedule: '{0}'."
+				}
+			],
+
+			'Element Get Function Error': [{
+				type:    "warning",
+				message: "Path: '{0}', have not exist in element."
+			}],
+
+			'Replace Key In String By Core Variable': [{
+				type:    "warning",
+				message: "Variable: '{0}', not found in Core."
+			}],
+
+			'Background Error': [{
+				type:    "warning",
+				message: "Background: '{0}', type '{1}', not found."
+			}, {
+				type:    "warning",
+				message: "Background: '{0}', incorect object."
+			}],
+
+			'Browser Error': [{
+				type:    "warning",
+				message: "Browser not support localStorage"
+			}],
+
+			'Append Method or Elems Key Error': [{
+				type:    "warning",
+				message: "Can't find typeof: '{0}'."
+			}, {
+				type:    "warning",
+				message: "Can't find method for: '{0}'."
+			}],
+
+			'Connect Element Error': [{
+				type:    "warning",
+				message: "Can't find master for: \n'{0}'."
+			}, {
+				type:    "warning",
+				message: "Can't find effect with name: '{0}'\nfor elem: '{1}'."
+			}],
+
+			'Files Errors': [{
+				type:    "error",
+				message: "No one script match '{0}'."
+			}],
+
+			'Effects Error': [{
+				type:    "warning",
+				message: "For effect '{0}', need have element: '{1}' on super."
+			}]
+		}
+
+		this.repeatString = function(str, step)
+		{
+			var curent = "";
+
+			for (var n=0; n < step; n++)
+			{
+				curent += str;
+			}
+
+			return curent;
+		}
+		
+		this.catch = function(errorType, errorNumber, args, browseError)
+		{
+			var error       = this.errors[errorType][errorNumber],
+				body        = this.format(error.message, args),
+				line        = this.repeatString("-", body.length),
+				shablone    = "{title}\n{line}\n{body}\n{line}\nBrowser Error:\n{ge}\n{line}\n\n",
+				browseError = (browseError !== undefined) ? browseError:'Core Error',
+				ignore      = (window['__debug__'] !== undefined) ? window['__debug__']:false,
+				curMessage  = this.format(shablone, {'title': errorType, 'line': line, 'body': body, 'ge': browseError});
+				
+			if (error.type === 'warning' || ignore)
+			{
+				console.log(curMessage);
+			} else {
+				throw curMessage;
+			}
+		}
+
+		this.format = function(str, args)
+		{
+			var toFormat   = ((typeof args) !== "string") ? args:[args],
+				curentLine = str;
+
+			for (var n in toFormat)
+			{
+				var key = "\\{" + n + "\\}";
+				curentLine = curentLine.replace(new RegExp(key, 'g'), toFormat[n]);
+			}
+
+			return curentLine;
+		}
+
+		this.__init__();
+	})();
