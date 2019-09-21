@@ -4,6 +4,8 @@ $color1: White;
 $color2: #1F4E6B;
 $color3: #1F4E7B;
 $color4: Black;
+$color5: #EBF2F4;
+$color6: #f2ffff;
 
 $button-font:  Arial;
 $caption-font: 'Archive Regular', Helvetica;
@@ -74,9 +76,17 @@ $caption-font: 'Archive Regular', Helvetica;
     &:hover
     {
         cursor: default;
-    }
-}
+        color:  $color5;
 
+        font-size:  calc(100% + 10%);
+    }
+
+    &:active
+    {
+        font-size:  calc(100% - 1%);
+    }
+
+}
 
 .MenuButton 
 {
@@ -125,6 +135,12 @@ $caption-font: 'Archive Regular', Helvetica;
         {
             font-family:         $caption-font;
             font-weight:         800;
+
+            &:active
+            {
+                font-size: calc(100% - 5%);
+                color:     $color6;
+            }
         }
 
         text-align:          left;

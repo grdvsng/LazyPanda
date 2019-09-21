@@ -136,74 +136,6 @@ function ScrollEffects(master)
 }
 
 
-function FlipEffects(master)
-{
-	var OOPMethods = new OOP(this),
-		self       = this,
-		parents    = [
-		];
-
-	this.flip_1 = 
-	{
-		event: 'click',
-
-		compile: function(elem)
-		{
-			var def = function()
-			{
-				var self     = this,
-					onResize = (this.onResize !== undefined) ? this.onResize:false;
-
-				if (!onResize)
-				{
-					var size = elem.getSize(),
-						nowX = size.height          + 'px',
-						nowY = size.width           + 'px',
-						newX = (size.height * 0.9)  + 'px',
-						newY = (size.width  * 0.9)  + 'px';
-					self.onResize = true;
-
-					elem.resize(newX, newY);
-
-					setTimeout(function()
-					{
-						elem.resize(nowX, nowY);
-						self.onResize = false;
-					}, 100);
-				}
-			};
-
-			_addEventListener(elem.domElement, this.event, master.effectCompiller(this.event, def));
-		}
-	}
-
-	this.flip_2 = 
-	{
-		event: 'click',
-
-		compile: function(elem)
-		{
-			var def = function()
-			{
-				var style = window.getComputedStyle(elem.domElement, null),
-			    	oldSize = Number(style['font-size'].replace('px', ""));
-				
-				elem.domElement.style['font-size'] = (oldSize - 1) + 'px';
-
-				setTimeout(function()
-				{
-					elem.domElement.style['font-size'] = oldSize + 'px';
-				}, 100);
-			};
-
-			_addEventListener(elem.domElement, this.event, master.effectCompiller(this.event, def));
-		}
-	}
-
-	OOPMethods.inheritance(parents);
-}
-
-
 function DisplayEffects(master)
 {
 	var OOPMethods = new OOP(this),
@@ -309,7 +241,6 @@ function DisplayEffects(master)
 			{
 				elem.caption.class = 'caption';
 
-				elem.caption.connectEffect('flip_2', true);
 				_addEventListener(
 					elem.caption.domElement,
 					this.event, 
@@ -361,47 +292,13 @@ function DisplayEffects(master)
 }
 
 
-function FocusEffects(master)
-{
-	var OOPMethods = new OOP(this),
-		self       = this,
-		parents    = [
-		];
-
-	this.focus_1 = {
-		event1: 'mouseout',
-		event2: 'mouseover',
-
-		compile: function(elem)
-		{	
-			var filer = (elem.domElement.style['filer'] !== undefined) ? elem.domElement.style['filer']:'none',
-				def1     = function()
-				{
-					elem.domElement.style['filter'] = "opacity(0.7)";
-				},
-				def2     = function()
-				{
-					elem.domElement.style['filter'] = filer;
-				};
-		
-			_addEventListener(elem.domElement, this.event2, master.effectCompiller(this.event2, def1));
-			_addEventListener(elem.domElement, this.event1, master.effectCompiller(this.event1, def2));
-		}
-	}
-
-	OOPMethods.inheritance(parents);
-}
-
-
 function UIEffects()
 {
 	var OOPMethods = new OOP(this),
 		self       = this,
 		parents    = [
 			ScrollEffects,
-			FlipEffects,
-			DisplayEffects,
-			FocusEffects
+			DisplayEffects
 		];
 
 	this.effectCompiller = function(event, func)

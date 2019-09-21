@@ -99,7 +99,11 @@
   color: inherit;
   outline: none; }
   .Buttons:hover, .MenuButton:hover, .hide-panel-button:hover {
-    cursor: default; }
+    cursor: default;
+    color: #EBF2F4;
+    font-size: calc(100% + 10%); }
+  .Buttons:active, .MenuButton:active, .hide-panel-button:active {
+    font-size: calc(100% - 1%); }
 
 .MenuButton {
   position: relative;
@@ -134,6 +138,9 @@
     .List .caption div {
       font-family: "Archive Regular", Helvetica;
       font-weight: 800; }
+      .List .caption div:active {
+        font-size: calc(100% - 5%);
+        color: #f2ffff; }
 
 .FlexMenu {
   border-width: 2px;
