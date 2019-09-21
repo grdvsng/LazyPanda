@@ -135,6 +135,14 @@ $caption-font: 'Archive Regular', Helvetica;
         {
             cursor: default;
         }
+        
+        *
+        {
+            * 
+            {
+                background: inherit;
+            }
+        }
 
         div
         {

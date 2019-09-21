@@ -83,7 +83,7 @@ function __LocalStorage__()
 
 	this.LocalStorageOnError = function(e)
 	{
-		__ErrorsCatcher__.catch('Browser Error', 0, null, e);
+		//__ErrorsCatcher__.catch('Browser Error', 0, null, e);
 	}
 
 	this.getLocalStorageItem = function(key)
@@ -1344,9 +1344,17 @@ function Obj()
 
 	this.removeDuplicate = function(arr)
 	{
-		var set =  new Set(arr);
+		var set    = new Set(arr),
+			curArr = [];
 
-		return Array.from(set);
+		if (Array.from) return Array.from(set);
+
+		for (var n=0; n < arr.Length; n++)
+		{
+			if (!this.foundKey(curArr, arr[n])) curArr.push(arr[n]);
+		}
+
+		return curArr;
 	}
 
 	// Слияние списков
