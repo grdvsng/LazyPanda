@@ -2,7 +2,11 @@ __config__ =
 {
 	"favicon": "./bin/shaders/favicon.gif",
 
-	"style":  "{FramePath}bin/styles/default_style.js",
+	"style":  
+	{
+		"title": "modern",
+		"path":  "{FramePath}bin/styles/modern"
+	},
 
 	"modules": [
 		"{FramePath}bin/modules/MethodsForObjects.js"

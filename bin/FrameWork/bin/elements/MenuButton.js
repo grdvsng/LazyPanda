@@ -7,7 +7,6 @@ var MenuButton = function(core, child, master)
 	this.domElement = null;
 	this.htmlClass  = (child.htmlClass === undefined) ? "button":child.htmlClass;
 	this.type       = "innerElement";
-	this.style      = than.style.parameters[this.class];
 	this.effects    = [
 		'flip_2',
 		'focus_1'

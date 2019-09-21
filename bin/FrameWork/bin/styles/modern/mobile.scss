@@ -1,0 +1,54 @@
+@import 'main';
+
+.FlexMenu 
+{
+    border-width:     2px; 
+    padding:          2px;   
+    padding-top:      0px;    
+    font-weight:      800; 
+    width:            50px;     
+    border-radius:    15px;
+
+    td
+    {
+        left:             2%;
+        right:            2%;
+        height:           4px;
+        margin-top:       5px;
+        border-radius:    15px;
+    }
+}
+
+.MenuPanel
+{
+    padding:          1%;
+    box-shadow:       inset 1px 1px 1px 1px $color3;
+}
+
+.MenuButton 
+{
+    font-size:   4em;
+    font-weight: 700;
+}
+
+.hide-panel-button
+{
+	position: absolute;
+    bottom: 5px;
+    width:  70px;
+    height: 70px;
+}
+
+.List
+{
+    td
+    {
+        padding-left: 0.9em;
+    }
+
+    .caption
+    {
+        font-size:           5em;
+        font-weight:         700;
+    }
+}

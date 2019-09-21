@@ -223,18 +223,17 @@ function DisplayEffects(master)
 				if (!hidden) 
 				{
 					elem.setAttributeForAllChild('style.color', 'red')
-					/*elem.smoothRetraction.apply(elem, [button, function() {
-						button.setText(button.hidenButton);
+					elem.smoothRetraction.apply(elem, [button, function() {
+						button.setIcon(button.hidenButton);
 						elem.childsHidden = true;
 					}]);
 
 					elem.hideAllChildNodes(button);
-					*/
 				} else {
 					elem.unRetraction.apply(elem, [function()
 					{
 						elem.showAllChildNodes(button);
-						button.setText(button.showButton);
+						button.setIcon(button.showButton);
 						elem.childsHidden = false;
 					}]);
 				}
@@ -243,10 +242,10 @@ function DisplayEffects(master)
 
 		def: function(elem, button)
 		{
-			button.hidenButton = (elem.position !== 3) ? '⇀':'↽';
-			button.showButton  = (elem.position !== 3) ? '↽':'⇀';
+			button.hidenButton = (elem.position === 3) ? '{FramePath}bin/styles/shaders/next.gif':'{FramePath}bin/styles/shaders/back.gif';
+			button.showButton  = (elem.position === 3) ? '{FramePath}bin/styles/shaders/back.gif':'{FramePath}bin/styles/shaders/next.gif';
 
-			button.setText(button.showButton);
+			button.setIcon(button.showButton);
 
 			return this.action(elem, button);
 		},
@@ -255,16 +254,15 @@ function DisplayEffects(master)
 		{	
 			var params = 
 				{
-					type:    "innerElement",
-					class:   "MenuButton",
-					content: "↽",
-					style: 
+					type:      "HTMLCollection",
+					class:     "hide-panel-button",
+					htmlClass: "div",
+					onRender: function()
 					{
-						position: 	   	 'absolute',
-						right:    	   	 '0%',
-						bottom:   	  	 '0%',
-						color:        	 elem.getStyleAttribute('color'),
-						'font-size':  	 (elem.getStyleAttribute('font-size') + 5) + 'px'
+						if (elem.position !== 3)
+						{
+							this.domElement.style.right    = "0px"
+						} else {this.domElement.style.left = "0px"}
 					}
 				},
 				button = elem.core.compileElement(params, elem);
@@ -500,24 +498,20 @@ function Element()
 		}
 	}
 
-	this.createNotTuchLable = function(master, style, content)
+	this.createNotTuchLable = function(master, content)
 	{
 		var params = {
 			'type':      'HTMLCollection',
 			'class':     'NotTuchLable',
 			'htmlClass': 'button',
 			'content': 	 content,
-			'style':     style,
 			'items':     []
 		};
-		
-		params.style.border  = 'none';
-		params.style.outline = 'none';
 
 		return params;
 	}
 
-	this.appendItemsInTable = function(table, items, rowStyle, notEmpty)
+	this.appendItemsInTable = function(table, items, notEmpty)
 	{
 		var notEmpty = notEmpty || false;
 		table.items  = (Array.isArray(table.items)) ? table.items:[table.items];;
@@ -532,7 +526,6 @@ function Element()
 				obj  = {
 					type:      'HTMLCollection',
 					htmlClass: 'td',
-					style:     rowStyle,
 					items:     elem
 				};
 
@@ -629,6 +622,15 @@ function ElementsMetamorphosesFunctions()
 			child.style.width  = y;
 			child.style.height = x;
 		}
+	}
+
+	this.createIcon = function(parameters)
+	{
+		if (this.icon) this.icon.__del__();
+
+		parameters.class = 'button-icon';
+		
+		return this.core.compileElement(parameters, this);
 	}
 
 	this.makeLineBetweenChildNodes = function()
@@ -784,6 +786,7 @@ function ElementsSetFunctions()
 	var OOPMethods = new OOP(this),
 		self       = this,
 		parents    = [
+			Formatting
 		];
 	
 	this.setAttributeForAllChild = function(attribute, value)
@@ -799,7 +802,24 @@ function ElementsSetFunctions()
 			child.setAttribute(attribute, value);
 		}
 	}
-	
+
+	this.setIcon = function(path)
+	{
+		var realPath  = this.replaceKeyInStringByExemplarVariable(path),
+			parameters = {
+				type:      'HTMLCollection', 
+				htmlClass: 'object',
+				data:      realPath
+			};
+
+		this.icon = this.createIcon(parameters);
+	}
+
+	this.setText = function(text)
+	{
+		this.domElement.innerText = text;
+	}
+
 	this.setAttribute = function(attribute, value, forDomElement)
 	{
 		var forDomElement = forDomElement || true,
@@ -1032,7 +1052,6 @@ function Сompiler()
 			master  = this.getMaster(master);
 		
 		exemplar.domElement = element;
-		child.style 	    = this.elementStyleCompile(exemplar.style, child.style); 
 		
 		if (child.effects !== undefined) child.effects = this.arrayAddition(exemplar.effects, child.effects, true);
 		
@@ -1042,28 +1061,6 @@ function Сompiler()
 		if (!notAppend) master.appendChild(element);
 		
 		return exemplar; 
-	}
-
-	this.elementStyleCompile = function(elem, params)
-	{
-		for (var key in params)
-		{
-			var val = params[key]
-				att = elem[key];
-			
-			if ((typeof val) === 'object' && (typeof att) === 'object') 
-			{
-				elem[key] = this.objectAddition(att, val);
-			}
-			else if ((typeof val) === 'string')
-			{
-				elem[key] = self.replaceKeyInStringByExemplarVariable(val);
-			} else {
-				elem[key] = val;
-			}
-		}
-
-		return elem;
 	}
 
 	this.generateIDForHTMLElement = function(element)
@@ -1143,13 +1140,14 @@ function Сompiler()
 	{
 		var title = (HTMLElement.title !== undefined) ? HTMLElement.title:innerElement.compile_parameters.title;
 		
+		innerElement.style = window.getComputedStyle(HTMLElement);
+		
 		if (innerElement.content !== undefined) 
 		{
 			HTMLElement.innerHTML += "<div>" + innerElement.content.trim() +  "</div>";
 			HTMLElement.title      = (title !== undefined) ? title:this.stringSlice(HTMLElement.innerText, 40);
 		}
 
-		this.elementStyleCompile(HTMLElement.style, innerElement.style);
 		this.generateDictWithIdAndClassAttributs(innerElement, HTMLElement);
 		this.connectMethodsForHTMLProto(HTMLElement);
 
@@ -1602,10 +1600,10 @@ function View()
 
 	this.changeMainView = function(view)
 	{
-		var mainView = this.changeView(view, window['mainView']);
+		var mainView  = this.changeView(view, window['mainView']);
 
-		document.body.style.background         = mainView.style.background;
-		document.body.style['background-size'] = (mainView.style['background-size'] !== undefined) ? mainView.style['background-size']:'100%';
+		document.body.style['background']      = mainView.style['background'];
+		document.body.style['background-size'] = mainView.style['background-size'] || '100%';
 		window['mainView']                     = mainView;
 
 		return mainView;
@@ -1739,14 +1737,27 @@ function __Core__(debug)
 	// Задания.
 	this.shedules = {
 		onLoad: [{
+			title: 'Change Style for device', 
+			
+			run:  function()
+			{
+				var style = self.config.style;
+
+				if(window.innerWidth <= 800 && window.innerHeight <= 600 && (window.innerWidth >= window.innerHeight)) 
+				{
+					self.style.domElement = self.connectStyle(style.path, 'mobile');
+				} else {
+					self.style.domElement = self.connectStyle(style.path, 'desktop');
+				}
+			}
+		}, {
 			title: 'Connect modules and elements', 
 			
 			run:  function()
 			{
 				var master = document.getElementsByTagName('head')[0],
 					paths  = [
-						self.config.modules, 
-						self.config.style,
+						self.config.modules,
 						self.config.elements,
 						self.config.views.viewsList
 					];
@@ -1761,20 +1772,6 @@ function __Core__(debug)
 		}],
 
 		onStart: [{
-			title: 'Change Style for device', 
-			
-			run:  function()
-			{
-				var style = window[self.style.title];
-
-				if(window.innerWidth <= 800 && window.innerHeight <= 600 && (window.innerWidth >= window.innerHeight)) 
-				{
-					self.style.parameters = self.viewStyleCompile(style, 'mobile');
-				} else {
-					self.style.parameters = self.viewStyleCompile(style, 'desktop');
-				}
-			}
-		}, {
 			title: 'Connect Elems, Pages and Methods', 
 			
 			run: function() 
@@ -1857,6 +1854,18 @@ function __Core__(debug)
 		this.start_schedules('onLoad');
 	}
 
+	this.connectStyle = function(path, mode)
+	{
+		var realPath = this.replaceKeyInStringByExemplarVariable(path) + "/" + mode + ".css",
+			link     = document.createElement('link'),
+			params   = {
+				'href': realPath,
+				'rel':  "stylesheet"
+			};
+
+		return self.connect(link, document.head, params);
+	}
+
 	// Добавления подключаемых элементов к движку.
 	this.appendMethodOrElemKey = function(path, attKey)
 	{
@@ -1903,7 +1912,7 @@ function __Core__(debug)
 		{
 			var val = innerElement[key];
 			
-			if ((key === "id") || (key === "class"))
+			if ((key === "id") || (key === "class") || (key === "data"))
 			{
 				HTMLElement.setAttribute(key, val);
 			} 

@@ -1,0 +1,110 @@
+$color1: White;
+$color2: #1F4E6B;
+$color3: #1F4E7B;
+$color4: Black;
+
+$main-font: Verdana;
+
+@mixin transform($property) 
+{
+    -webkit-transform: $property;
+    -ms-transform:     $property;
+    transform:         $property;
+}
+
+%NotTuchLable
+{
+    border:           none;
+    outline:          none;
+    background-color: inherit;
+    color:            inherit;
+    font-size:        inherit;
+    font-weight:      inherit;
+}
+
+
+.NotTuchLable
+{
+    @extend %NotTuchLable;
+}
+
+.DefaultView 
+{
+        background: url("../shaders/default.svg") no-repeat bottom center fixed;
+}
+
+.FlexMenu 
+{
+    background-color: $color1;
+    border-style:     solid;
+    border-color:     $color2;
+    color:            $color3;
+    position:         absolute;
+    vertical-align:   middle;
+    
+    td
+    {
+        background-color: $color2;
+    }
+}
+
+.Buttons
+{
+    font-family:      $main-font;
+    background-color: $color2;
+    border:           none;
+    color:            inherit;
+    outline:          none;
+
+    &:hover
+    {
+        cursor: default;
+    }
+}
+
+
+.MenuButton 
+{
+    @extend .Buttons;
+    position:    relative;
+    text-align:  left;
+}
+
+.button-icon
+{
+    position: relative;
+    top:      0px;
+    width:    99%;
+    height:   99%;
+}
+
+.hide-panel-button
+{
+    @extend .Buttons;
+    position: absolute;
+}
+
+.MenuPanel
+{
+    border-color:     $color2;
+    background-color: $color2;
+    color:            $color1;
+    position:         absolute;
+}
+
+
+.List
+{
+    background-color: $color2;
+    position: relative;
+
+    .caption
+    {
+        text-align:          left;
+        list-style-position: inside;
+        font-family:         $main-font;
+        background-color:    $color2;
+        color:               inherit;
+        list-style-type:     none;
+    }
+}

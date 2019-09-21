@@ -10,7 +10,6 @@ var FlexMenu = function(core, child, master)
 	this.htmlClass    = (child.htmlClass === undefined) ? "table":child.htmlClass;
 	this.position     = (child.position  === undefined) ? 0:child.position;
 	this.type         = "innerElement";
-	this.style        = than.style.parameters[this.class];
 
 	this.positions = [{
 			left:   '2%',

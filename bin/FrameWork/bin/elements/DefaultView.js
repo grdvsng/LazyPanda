@@ -8,6 +8,5 @@ var DefaultView = function(core, child, master)
 	this.master     = null;
 	this.domElement = null;
 	this.htmlClass  = (child.htmlClass === undefined) ? "div":child.htmlClass;
-	this.style      = than.style.parameters[this.class];
 	this.items      = null;
 };

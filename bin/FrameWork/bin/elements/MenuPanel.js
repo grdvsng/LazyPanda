@@ -6,7 +6,6 @@ var MenuPanel = function(core, child, master)
 	this.class      = "MenuPanel";
 	this.domElement = null;
 	this.htmlClass  = (child.htmlClass === undefined) ? "table":child.htmlClass;
-	this.style      = than.style.parameters[this.class];
 	this.type       = "innerElement";
 	this.position   = (child.position  === undefined) ? 0:child.position;
 	this.positions  = [{

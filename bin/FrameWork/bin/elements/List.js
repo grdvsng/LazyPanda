@@ -8,24 +8,22 @@ var List = function(core, child, master)
 	this.master     = null;
 	this.domElement = null;
 	this.htmlClass  = (child.htmlClass === undefined) ? "div":child.htmlClass;
-	this.style      = than.style.parameters[this.class];
 	this.items      = null;
 	this.content    = (child !== undefined) ? child.content:"";
 
 	this.converChildItemsToList = function(items)
 	{
-		var caption = than.createNotTuchLable(child.master, self.style['ul'], self.content),
+		var caption = than.createNotTuchLable(child.master, self.content),
 			table   = {
 				items: [{
 					type:      'HTMLCollection', 
 					htmlClass: 'th',
-					style:     self.style['ul'],
 					class:     'caption',
 					items:     caption
 				}]
 			};
 
-		than.appendItemsInTable(table, items, self.style['ul']['li'], true);
+		than.appendItemsInTable(table, items, true);
 
 		self.caption = table.items[0];
 

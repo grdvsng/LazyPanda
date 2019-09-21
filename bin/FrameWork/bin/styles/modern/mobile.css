@@ -1,0 +1,95 @@
+.NotTuchLable {
+  border: none;
+  outline: none;
+  background-color: inherit;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit; }
+
+.DefaultView {
+  background: url("../shaders/default.svg") no-repeat bottom center fixed; }
+
+.FlexMenu {
+  background-color: White;
+  border-style: solid;
+  border-color: #1F4E6B;
+  color: #1F4E7B;
+  position: absolute;
+  vertical-align: middle; }
+  .FlexMenu td {
+    background-color: #1F4E6B; }
+
+.Buttons, .MenuButton, .hide-panel-button {
+  font-family: Verdana;
+  background-color: #1F4E6B;
+  border: none;
+  color: inherit;
+  outline: none; }
+  .Buttons:hover, .MenuButton:hover, .hide-panel-button:hover {
+    cursor: default; }
+
+.MenuButton {
+  position: relative;
+  text-align: left; }
+
+.button-icon {
+  position: relative;
+  top: 0px;
+  width: 99%;
+  height: 99%; }
+
+.hide-panel-button {
+  position: absolute; }
+
+.MenuPanel {
+  border-color: #1F4E6B;
+  background-color: #1F4E6B;
+  color: White;
+  position: absolute; }
+
+.List {
+  background-color: #1F4E6B;
+  position: relative; }
+  .List .caption {
+    text-align: left;
+    list-style-position: inside;
+    font-family: Verdana;
+    background-color: #1F4E6B;
+    color: inherit;
+    list-style-type: none; }
+
+.FlexMenu {
+  border-width: 2px;
+  padding: 2px;
+  padding-top: 0px;
+  font-weight: 800;
+  width: 50px;
+  border-radius: 15px; }
+  .FlexMenu td {
+    left: 2%;
+    right: 2%;
+    height: 4px;
+    margin-top: 5px;
+    border-radius: 15px; }
+
+.MenuPanel {
+  padding: 1%;
+  box-shadow: inset 1px 1px 1px 1px #1F4E7B; }
+
+.MenuButton {
+  font-size: 4em;
+  font-weight: 700; }
+
+.hide-panel-button {
+  position: absolute;
+  bottom: 5px;
+  width: 70px;
+  height: 70px; }
+
+.List td {
+  padding-left: 0.9em; }
+.List .caption {
+  font-size: 5em;
+  font-weight: 700; }
+
+/*# sourceMappingURL=mobile.css.map */
