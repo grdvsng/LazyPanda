@@ -131,6 +131,11 @@ $caption-font: 'Archive Regular', Helvetica;
 
     .caption
     {
+        *:hover
+        {
+            cursor: default;
+        }
+
         div
         {
             font-family:         $caption-font;

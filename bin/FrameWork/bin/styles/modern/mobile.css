@@ -135,6 +135,8 @@
     background-color: #1F4E6B;
     color: inherit;
     list-style-type: none; }
+    .List .caption *:hover {
+      cursor: default; }
     .List .caption div {
       font-family: "Archive Regular", Helvetica;
       font-weight: 800; }
