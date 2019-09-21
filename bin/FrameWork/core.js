@@ -1,13 +1,14 @@
-function addeventlistener(HTMLElement, event, action)
+function _addEventListener(element, event, action)
 {
 	if ((typeof action) !== 'string')
 	{
-		if (HTMLElement.addEventListener)
+
+		if (element.addEventListener)
 		{
-			HTMLElement.addEventListener(event, action);
-		} else {HTMLElement.attachEvent(event, action);}
+			element.addEventListener(event, action);
+		} else {element.attachEvent(event, action);}
 	} else {
-		HTMLElement['on' + event] = function(){eval(action)};
+		element['on' + event] = function(){eval(action)};
 	}
 }
 
@@ -124,7 +125,7 @@ function ScrollEffects(master)
 
 		compile: function(elem)
 		{
-			document.addEventListener(this.event, function()
+			_addEventListener(document, this.event, function()
 			{
 				elem.domElement.style.top = elem.core.scrollTop();
 			});
@@ -172,7 +173,7 @@ function FlipEffects(master)
 				}
 			};
 
-			elem.domElement.addEventListener(this.event, master.effectCompiller(this.event, def));
+			_addEventListener(elem.domElement, this.event, master.effectCompiller(this.event, def));
 		}
 	}
 
@@ -195,7 +196,7 @@ function FlipEffects(master)
 				}, 100);
 			};
 
-			elem.domElement.addEventListener(this.event, master.effectCompiller(this.event, def));
+			_addEventListener(elem.domElement, this.event, master.effectCompiller(this.event, def));
 		}
 	}
 
@@ -224,7 +225,7 @@ function DisplayEffects(master)
 				{
 					elem.setAttributeForAllChild('style.color', 'red')
 					elem.smoothRetraction.apply(elem, [button, function() {
-						button.setIcon(button.hidenButton);
+						button.setIconFromPath(button.hidenButton);
 						elem.childsHidden = true;
 					}]);
 
@@ -233,7 +234,7 @@ function DisplayEffects(master)
 					elem.unRetraction.apply(elem, [function()
 					{
 						elem.showAllChildNodes(button);
-						button.setIcon(button.showButton);
+						button.setIconFromPath(button.showButton);
 						elem.childsHidden = false;
 					}]);
 				}
@@ -242,10 +243,14 @@ function DisplayEffects(master)
 
 		def: function(elem, button)
 		{
-			button.hidenButton = (elem.position === 3) ? '{FramePath}bin/styles/shaders/next.gif':'{FramePath}bin/styles/shaders/back.gif';
-			button.showButton  = (elem.position === 3) ? '{FramePath}bin/styles/shaders/back.gif':'{FramePath}bin/styles/shaders/next.gif';
+			var iPath = (elem.core.config.style.graphic ||  elem.core.config.style.path + "/graphic"),
+				back  = iPath + '/back.svg',
+				next  = iPath + '/next.svg';
+			
+			button.hidenButton = (elem.position === 3) ? back:next;
+			button.showButton  = (elem.position === 3) ? next:back;
 
-			button.setIcon(button.showButton);
+			button.setIconFromPath(button.showButton);
 
 			return this.action(elem, button);
 		},
@@ -257,6 +262,7 @@ function DisplayEffects(master)
 					type:      "HTMLCollection",
 					class:     "hide-panel-button",
 					htmlClass: "div",
+
 					onRender: function()
 					{
 						if (elem.position !== 3)
@@ -266,8 +272,9 @@ function DisplayEffects(master)
 					}
 				},
 				button = elem.core.compileElement(params, elem);
-
-			button.domElement.addEventListener(this.event, this.def(elem, button));
+			
+			button.events = [{event: this.event, action: this.def(elem, button)}];
+			button.core.connectEvents(button.domElement, button.events);
 		}
 	}
 
@@ -303,7 +310,8 @@ function DisplayEffects(master)
 				elem.caption.class = 'caption';
 
 				elem.caption.connectEffect('flip_2', true);
-				elem.caption.domElement.addEventListener(
+				_addEventListener(
+					elem.caption.domElement,
 					this.event, 
 					this.def(elem, 25, 
 						function() {this.setFilter('blur(1px)');},
@@ -325,7 +333,7 @@ function DisplayEffects(master)
 				elem.caption.class = 'caption';
 				
 				elem.caption.connectEffect('flip_2', true);
-				elem.caption.domElement.addEventListener(this.event, self['hide list 1'].def(elem, 50));
+				_addEventListener(elem.caption.domElement, this.event, self['hide list 1'].def(elem, 50));
 			} else {
 				__ErrorsCatcher__.catch('Effects Error', 0, ['hide list', 'caption']);
 			}
@@ -342,7 +350,7 @@ function DisplayEffects(master)
 				elem.caption.class = 'caption';
 				
 				elem.caption.connectEffect('flip_2', true);
-				elem.caption.domElement.addEventListener(this.event, self['hide list 1'].def(elem, 50, self['letters disappear'].def, self['letters showing'].def));
+				_addEventListener(elem.caption.domElement, this.event, self['hide list 1'].def(elem, 50, self['letters disappear'].def, self['letters showing'].def));
 			} else {
 				__ErrorsCatcher__.catch('Effects Error', 0, ['hide list', 'caption']);
 			}
@@ -376,8 +384,8 @@ function FocusEffects(master)
 					elem.domElement.style['filter'] = filer;
 				};
 		
-			elem.domElement.addEventListener(this.event2, master.effectCompiller(this.event2, def1));
-			elem.domElement.addEventListener(this.event1, master.effectCompiller(this.event1, def2));
+			_addEventListener(elem.domElement, this.event2, master.effectCompiller(this.event2, def1));
+			_addEventListener(elem.domElement, this.event1, master.effectCompiller(this.event1, def2));
 		}
 	}
 
@@ -447,10 +455,7 @@ function ElementsConnectFunctions()
 		
 		if (forAllChilds) 
 		{
-			for (var n=0; n < this.items.length; n++) 
-			{
-				this.items[n].connectEffect(effectName, forAllChilds);
-			}
+			for (var n=0; n < this.items.length; n++) this.items[n].connectEffect(effectName, forAllChilds);
 		}
 	}
 
@@ -490,11 +495,12 @@ function Element()
 
 	this.connectEvents = function(HTMLElement, events)
 	{
+		
 		for (var n=0; n < events.length; n++)
 		{
 			var params = events[n];
-			
-			addeventlistener(HTMLElement, params.event, params.action);
+
+			_addEventListener(HTMLElement, params.event, params.action);
 		}
 	}
 
@@ -626,11 +632,14 @@ function ElementsMetamorphosesFunctions()
 
 	this.createIcon = function(parameters)
 	{
+		var icon;
+
 		if (this.icon) this.icon.__del__();
 
-		parameters.class = 'button-icon';
-		
-		return this.core.compileElement(parameters, this);
+		parameters.class  = 'button-icon';
+		icon              = this.core.compileElement(parameters, this);
+
+		return icon;
 	}
 
 	this.makeLineBetweenChildNodes = function()
@@ -803,16 +812,18 @@ function ElementsSetFunctions()
 		}
 	}
 
-	this.setIcon = function(path)
+	this.setIconFromPath = function(path, styleParams)
 	{
-		var realPath  = this.replaceKeyInStringByExemplarVariable(path),
+		var realPath   = this.replaceKeyInStringByExemplarVariable(path),
 			parameters = {
 				type:      'HTMLCollection', 
-				htmlClass: 'object',
-				data:      realPath
+				htmlClass: 'div'
 			};
 
 		this.icon = this.createIcon(parameters);
+		this.icon.setBackground(realPath, styleParams || " center no-repeat");
+
+		return this.icon;
 	}
 
 	this.setText = function(text)
@@ -861,6 +872,15 @@ function ElementsSetFunctions()
 		}
 
 		if (effectAfter) effectAfter.apply(child);
+	}
+
+	this.setBackground = function(path, params)
+	{
+		var params  = params || "",
+			relPath = this.replaceKeyInStringByExemplarVariable(path),
+			value   = 'url("' + relPath + '")' + " " + params;
+		
+		this.domElement.style['background'] = value;
 	}
 
 	this.setDisplayModeForAllChildNodes = function(mode, _except, inerval, func)
@@ -999,10 +1019,11 @@ function ElementsRemoveFunctions()
 
 	this.__del__ = function()
 	{
-		this.domElement.__del__();
+		var __self__ = this;
+		
 		this.removeChildren();
-
-		this.core.objects = this.core.objects.filter(function(el){return !el.deleted});
+		
+		if (!this.actionWithChildren) this.domElement.__del__();
 	}
 
 	this.removeItem = function(item)
@@ -1015,15 +1036,18 @@ function ElementsRemoveFunctions()
 		return this.items;
 	}
 	
-	this.removeChildren = function(n)
+	this.removeChildren = function()
 	{
-		var n     = (n !== undefined) ? n:0,
-			child = this.items[n];
+		this.actionWithChildren = true;
 
-		if (child) child.__del__();
+		for (var n=0; n < this.items.length; n++)
+		{
+			var child = this.items[n];
 
-		if (n < this.items.length) {this.removeChildren(n+1);} 
-		else                       {this.items = [];}
+			child.__del__();
+		}
+
+		this.actionWithChildren = false;
 	}
 
 	OOPMethods.inheritance(parents);
@@ -1140,8 +1164,9 @@ function Сompiler()
 	{
 		var title = (HTMLElement.title !== undefined) ? HTMLElement.title:innerElement.compile_parameters.title;
 		
-		innerElement.style = window.getComputedStyle(HTMLElement);
-		
+		innerElement.style     = HTMLElement.style;
+		innerElement.fullStyle = window.getComputedStyle(HTMLElement);
+
 		if (innerElement.content !== undefined) 
 		{
 			HTMLElement.innerHTML += "<div>" + innerElement.content.trim() +  "</div>";
@@ -1150,8 +1175,6 @@ function Сompiler()
 
 		this.generateDictWithIdAndClassAttributs(innerElement, HTMLElement);
 		this.connectMethodsForHTMLProto(HTMLElement);
-
-		if (innerElement.events) this.connectEvents(HTMLElement, innerElement.events);
 
 		return HTMLElement;
 	}
@@ -1168,7 +1191,9 @@ function Сompiler()
 		if (compiled.effects)                this.appendFunctionOnInnerElementOnRender(compiled);
 		if (compiled.onRender !== undefined) compiled.onRender();
 		if (el.label)                        compiled.label = this.compileTextLabel(compiled, el.label);
-
+		
+		this.connectEvents(compiled.domElement, this.arrayAddition(compiled.events, el.events));
+		
 		compiled.master.items.push(compiled);
 		this.objects.push(compiled);
 	}
@@ -1179,12 +1204,12 @@ function Сompiler()
 			elem      = undefined,
 			notAppend = notAppend || false;
 		
-		master                = el.master = (el.master !== undefined) ? el.master:master;
-		master.items          = (master.items !== undefined) ? master.items:[];
+		master       = el.master = (el.master !== undefined) ? el.master:master;
+		master.items = (master.items !== undefined) ? master.items:[];
 
 		if (type === "HTMLCollection")   elem = this.compileHTMLElement(el, master, notAppend);
 		if (type === "innerElement")     elem = this.compileInnerElement(el, master, notAppend);		
-		
+
 		this.afterCompile(el, elem);
 
 		return elem;
@@ -1322,17 +1347,21 @@ function HTMLElement()
 		'action': function()
 		{
 			var self   = this,
-				master = this.super.master;
+				master = this.super.master,
+				_super = this.super;
 
-			this.super.deleted = true;
-			master.items       = this.super.master.items.filter(function(el)
+			_super.deleted       = true;
+			master.items         = master.items.filter(function(el) {return !el.deleted && !master.deleted;});
+			_super.core.objects  = _super.core.objects.filter(function(el) 
 			{
-				return !el.deleted && !master.deleted;
+				var del = (el.deleted !== undefined) || (el.master.deleted !== undefined);
+
+				return !del;
 			});
 
 			(this.remove) ? this.remove():this.parentNode.removeChild(this);
-
-			delete this;
+			
+			delete _super;
 		}
 	}]
 
@@ -1602,8 +1631,8 @@ function View()
 	{
 		var mainView  = this.changeView(view, window['mainView']);
 
-		document.body.style['background']      = mainView.style['background'];
-		document.body.style['background-size'] = mainView.style['background-size'] || '100%';
+		document.body.style['background']      = mainView.fullStyle['background'];
+		document.body.style['background-size'] = mainView.fullStyle['background-size'] || '100%';
 		window['mainView']                     = mainView;
 
 		return mainView;
@@ -1647,11 +1676,6 @@ function View()
 		}
 
 		return style;
-	}
-
-	this.setBackground = function(val)
-	{
-		self.domElement.style['background'] = this.replaceKeyInStringByExemplarVariable(val);
 	}
 
 	this.__init__();

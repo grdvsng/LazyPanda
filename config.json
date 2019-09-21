@@ -1,11 +1,11 @@
 __config__ = 
 {
-	"favicon": "./bin/shaders/favicon.gif",
+	"favicon": "./bin/graphic/favicon.gif",
 
 	"style":  
 	{
-		"title": "modern",
-		"path":  "{FramePath}bin/styles/modern"
+		"title":   "modern",
+		"path":    "{FramePath}bin/styles/modern"
 	},
 
 	"modules": [
