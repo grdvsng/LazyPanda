@@ -74,7 +74,7 @@
 .NotTuchLable {
   border: none;
   outline: none;
-  background-color: inherit;
+  background: inherit;
   color: inherit;
   font-size: inherit;
   font-weight: inherit; }
@@ -89,25 +89,25 @@
   color: #1F4E7B;
   position: absolute;
   vertical-align: middle; }
-  .FlexMenu td {
+  .FlexMenu .list-row {
     background-color: #1F4E6B; }
 
 .Buttons, .MenuButton, .hide-panel-button {
   font-family: Arial;
-  background-color: #1F4E6B;
+  background: #1F4E6B;
   border: none;
   color: inherit;
   outline: none; }
   .Buttons:hover, .MenuButton:hover, .hide-panel-button:hover {
-    cursor: default;
-    color: #EBF2F4;
-    font-size: calc(100% + 10%); }
-  .Buttons:active, .MenuButton:active, .hide-panel-button:active {
-    font-size: calc(100% - 1%); }
+    cursor: default; }
+    .Buttons:hover *, .MenuButton:hover *, .hide-panel-button:hover * {
+      color: #EBF2F4; }
 
 .MenuButton {
   position: relative;
-  text-align: left; }
+  text-align: right; }
+  .MenuButton * {
+    text-align: left; }
 
 .button-icon {
   position: relative;
@@ -117,34 +117,32 @@
 
 .hide-panel-button {
   position: absolute; }
-  .hide-panel-button div:hover {
-    animation: 1s ease 0s leftPulse infinite; }
+  .hide-panel-button div {
+    font-family: "Archive Regular", Helvetica;
+    font-weight: 800; }
+    .hide-panel-button div:active {
+      font-size: calc(100% - 1%);
+      color: #f2ffff; }
+    .hide-panel-button div:hover {
+      animation: 1s ease 0s leftPulse infinite; }
 
 .MenuPanel {
   border-color: #1F4E6B;
-  background-color: #1F4E6B;
+  background: #1F4E6B;
   color: White;
   position: absolute; }
 
 .List {
+  background: #1F4E6B;
+  position: relative;
   background-color: #1F4E6B;
-  position: relative; }
+  color: inherit; }
+  .List .NotTuchLable {
+    background: #1F4E6B; }
   .List .caption {
-    text-align: left;
-    list-style-position: inside;
-    background-color: #1F4E6B;
-    color: inherit;
-    list-style-type: none; }
+    text-align: left; }
     .List .caption *:hover {
       cursor: default; }
-    .List .caption * * {
-      background: inherit; }
-    .List .caption div {
-      font-family: "Archive Regular", Helvetica;
-      font-weight: 800; }
-      .List .caption div:active {
-        font-size: calc(100% - 5%);
-        color: #f2ffff; }
 
 .FlexMenu {
   border-width: 2px;
@@ -161,14 +159,20 @@
     border-radius: 15px; }
 
 .MenuPanel {
-  padding: 1%;
+  padding: 10px 10px 10px 5px;
   box-shadow: inset 1px 1px 1px 1px #1F4E7B;
   min-width: 70px;
   min-height: 70px; }
 
 .MenuButton {
-  font-size: 4em;
+  font-size: 22pt;
   font-weight: 700; }
+  .MenuButton:hover * {
+    font-size: 23pt; }
+  .MenuButton:active {
+    font-size: 21pt; }
+    .MenuButton:active * {
+      font-size: 21.5pt; }
 
 .hide-panel-button {
   position: absolute;
@@ -176,10 +180,14 @@
   width: 70px;
   height: 70px; }
 
-.List td {
-  padding-left: 0.9em; }
-.List .caption {
-  font-size: 5em;
-  font-weight: 700; }
+.list-row * {
+  padding-left: 0.35em; }
+
+.List {
+  padding-left: 0.25em;
+  padding-right: 0.25em; }
+  .List .caption {
+    font-size: 5em;
+    font-weight: 700; }
 
 /*# sourceMappingURL=mobile.css.map */

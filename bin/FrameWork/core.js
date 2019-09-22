@@ -424,17 +424,19 @@ function Element()
 			var elem = items[n],
 				tr   = {
 					type:      'HTMLCollection',
+					class:     'list-empty-row',
 					htmlClass: 'tr'
 				},
-				obj  = {
+				row  = {
 					type:      'HTMLCollection',
-					htmlClass: 'td',
+					htmlClass: 'tr',
+					class:     'list-row',
 					items:     elem
 				};
 
 			if (n === 0 && notEmpty) table.items.push(tr);
 			
-			table.items.push(obj);
+			table.items.push(row);
 
 			if (n != items.length)   table.items.push(tr);
 		}
@@ -974,8 +976,11 @@ function Сompiler()
 		
 		exemplar.domElement = element;
 		
-		if (child.effects !== undefined) child.effects = this.arrayAddition(exemplar.effects, child.effects, true);
-		
+		if (child.effects !== undefined) 
+		{
+			child.effects = this.arrayAddition(exemplar.effects, child.effects, true);
+		}
+
 		this.objectAddition(exemplar, child);
 		this.connectInnerAttsToHTMLObject(exemplar, element, child);
 		
@@ -1342,31 +1347,61 @@ function Obj()
 		OOPMethods.inheritance(parents);
 	}
 
+	this.isKeyInArray = function(arr, key)
+	{
+		var keyFound = false;
+
+		for (var n=0; n < arr.Length; n++)
+		{
+			if (key === arr[n]) 
+			{
+				keyFound = true;
+
+				break;
+			}
+		}
+
+		return keyFound;
+	}
+	
+	this.removeDuplicateOldBrowser = function(arr)
+	{
+		var curArr = [];
+
+		for (var i=0; i < arr.length; i++)
+		{
+			if (!this.isKeyInArray(curArr, arr[i])) 
+			{
+				curArr.push(arr[i]);
+			}
+		}
+
+		return curArr;
+	} 
+
 	this.removeDuplicate = function(arr)
 	{
 		var set    = new Set(arr),
 			curArr = [];
 
-		if (Array.from) return Array.from(set);
-
-		for (var n=0; n < arr.Length; n++)
+		if (Array.from) 
 		{
-			if (!this.foundKey(curArr, arr[n])) curArr.push(arr[n]);
+			curArr = Array.from(set);
+		} else {
+			curArr = this.removeDuplicateOldBrowser(arr);
 		}
-
+		
 		return curArr;
 	}
 
 	// Слияние списков
  	this.arrayAddition = function(arr1, arr2, remDup)
  	{
- 		var loop   = (loop   !== undefined) ? loop:false,
- 			arr1   = (arr1   !== undefined) ? arr1:[],
- 			arr2   = (arr2   !== undefined) ? arr2:[],
- 			remDup = (remDup !== undefined) ? remDup:false,
- 			loop   = arr2.length;
+ 		var arr1   = arr1   || [],
+ 			arr2   = arr2   || [],
+ 			remDup = remDup || false;
 
- 		for (var n=0; n < loop; n++) arr1.push(arr2[n]);
+ 		for (var n=0; n < arr2.length; n++) arr1.push(arr2[n]);
  		
  		if (remDup) arr1 = this.removeDuplicate(arr1, arr2);
  		

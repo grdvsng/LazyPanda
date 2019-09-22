@@ -33,7 +33,7 @@ $caption-font: 'Archive Regular', Helvetica;
 {
     border:           none;
     outline:          none;
-    background-color: inherit;
+    background:       inherit;
     color:            inherit;
     font-size:        inherit;
     font-weight:      inherit;
@@ -58,8 +58,8 @@ $caption-font: 'Archive Regular', Helvetica;
     color:            $color3;
     position:         absolute;
     vertical-align:   middle;
-    
-    td
+
+    .list-row
     {
         background-color: $color2;
     }
@@ -68,31 +68,33 @@ $caption-font: 'Archive Regular', Helvetica;
 .Buttons
 {
     font-family:      $button-font;
-    background-color: $color2;
+    background:       $color2;
     border:           none;
     color:            inherit;
     outline:          none;
 
     &:hover
     {
-        cursor: default;
-        color:  $color5;
+        cursor:    default;
 
-        font-size:  calc(100% + 10%);
+        *
+        {
+            color:     $color5;
+        }
     }
-
-    &:active
-    {
-        font-size:  calc(100% - 1%);
-    }
-
 }
 
 .MenuButton 
 {
     @extend .Buttons;
+
     position:    relative;
-    text-align:  left;
+    text-align:  right;
+
+    * 
+    {
+        text-align:  left;
+    }
 }
 
 .button-icon
@@ -108,26 +110,43 @@ $caption-font: 'Archive Regular', Helvetica;
     @extend .Buttons;
     
     position: absolute;
-
-    div:hover 
+    
+    div
     {
-        animation: 1s ease 0s leftPulse infinite;
+        font-family:         $caption-font;
+        font-weight:         800;
+
+        &:active
+        {
+            font-size: calc(100% - 1%);
+            color:     $color6;
+        }
+
+        &:hover 
+        {
+            animation: 1s ease 0s leftPulse infinite;
+        }
     }
 }
 
 .MenuPanel
 {
-    border-color:     $color2;
-    background-color: $color2;
-    color:            $color1;
-    position:         absolute;
+    border-color:  $color2;
+    background:    $color2;
+    color:         $color1;
+    position:      absolute;
 }
 
 
 .List
 {
-    background-color: $color2;
-    position: relative;
+    background: $color2;
+    position:   relative;
+
+    .NotTuchLable
+    {
+        background: $color2;
+    }
 
     .caption
     {
@@ -135,31 +154,10 @@ $caption-font: 'Archive Regular', Helvetica;
         {
             cursor: default;
         }
-        
-        *
-        {
-            * 
-            {
-                background: inherit;
-            }
-        }
 
-        div
-        {
-            font-family:         $caption-font;
-            font-weight:         800;
-
-            &:active
-            {
-                font-size: calc(100% - 5%);
-                color:     $color6;
-            }
-        }
-
-        text-align:          left;
-        list-style-position: inside;
-        background-color:    $color2;
-        color:               inherit;
-        list-style-type:     none;
+        text-align: left;
     }
+
+    background-color:    $color2;
+    color:               inherit;
 }

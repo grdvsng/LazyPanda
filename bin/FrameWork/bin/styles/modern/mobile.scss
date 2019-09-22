@@ -1,5 +1,8 @@
 @import 'main';
 
+
+$MenuButton-font-size: 22pt;
+
 .FlexMenu 
 {
     border-width:     2px; 
@@ -21,7 +24,7 @@
 
 .MenuPanel
 {
-    padding:          1%;
+    padding:          10px 10px 10px 5px;
     box-shadow:       inset 1px 1px 1px 1px $color3;
     min-width:        70px;
     min-height:       70px;
@@ -29,8 +32,26 @@
 
 .MenuButton 
 {
-    font-size:   4em;
+    font-size:   $MenuButton-font-size;
     font-weight: 700;
+
+    &:hover
+    {
+       * 
+        {
+            font-size: $MenuButton-font-size + 1;
+        }
+    }
+
+    &:active
+    {
+        font-size: $MenuButton-font-size - 1;
+
+        *
+        {
+            font-size: $MenuButton-font-size - 0.5;
+        }
+    }
 }
 
 .hide-panel-button
@@ -41,12 +62,18 @@
     height: 70px;
 }
 
+.list-row
+{
+    *
+    {
+        padding-left: 0.35em; 
+    }
+}
+
 .List
 {
-    td
-    {
-        padding-left: 0.9em;
-    }
+    padding-left:  0.25em;
+    padding-right: 0.25em;
 
     .caption
     {
