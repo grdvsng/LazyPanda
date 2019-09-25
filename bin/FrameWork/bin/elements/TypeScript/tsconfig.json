@@ -1,0 +1,19 @@
+{
+    "compileOnSave": false,
+    
+    "files":
+    [
+        "./DefaultView.ts",
+        "./BasicElement.ts"
+    ],
+
+    "compilerOptions":
+    {
+        "target": "es3",
+    	"outDir": "../",
+    	"baseUrl": "./",
+    	"rootDir": "./",
+        "sourceMap": false,
+        "removeComments": true
+    }
+}

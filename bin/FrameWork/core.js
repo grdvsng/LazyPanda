@@ -1394,6 +1394,21 @@ function Obj()
 		return curArr;
 	}
 
+	this.insertInArray = function(arr, index, value)
+	{
+		var arr      = (arr !== undefined) ? arr:[],
+			curArray = [];
+
+		for (var n=0; n < arr.length; n++)
+		{
+			if (n === index) curArray.push(value);
+
+			curArray.push(arr[n]);
+		}
+
+		return curArray;
+	}
+
 	// Слияние списков
  	this.arrayAddition = function(arr1, arr2, remDup)
  	{
@@ -1715,6 +1730,13 @@ function __Core__(debug)
 				}
 			}
 		}, {
+			title: 'Preseting for CFG', 
+			
+			run:  function()
+			{
+				self.config.elements = self.insertInArray(self.config.elements,  0, "{FramePath}bin/elements/BasicElement.js");
+			}
+		}, {
 			title: 'Connect modules and elements', 
 			
 			run:  function()
@@ -1905,7 +1927,19 @@ function __Core__(debug)
 }
 
 
-var	__ErrorsCatcher__ = new (function ()
+var	exports = {},
+	require = function(path)
+	{
+		var parsedPath = path.match(/(?=[\/\\]).*?[^\/\\]+(?![\/\\])/g),
+			varName    = parsedPath[parsedPath.length - 1].replace(/^[\\//]/g, ""),
+			obj        =  new (function()
+			{
+				this[varName] = exports[varName];
+			})();
+
+		return obj;
+	},
+	__ErrorsCatcher__ = new (function ()
 	{
 		var OOPMethods = new OOP(this),
 			self       = this,
