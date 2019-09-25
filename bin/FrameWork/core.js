@@ -1869,11 +1869,16 @@ function __Core__(debug)
 				}
 			}
 		}, {
-			title: 'Preseting for CFG', 
+			title: 'Connect basic module to Core.', 
 			
 			run:  function()
 			{
-				self.config.elements = self.insertInArray(self.config.elements,  0, "{FramePath}bin/elements/BasicElement.js");
+				self.globalStartConnector(
+					["{FramePath}bin/elements/BasicElement.js"],  
+					'script', 
+					document.head, 
+					'src'
+				);
 			}
 		}, {
 			title: 'Connect modules and elements', 
