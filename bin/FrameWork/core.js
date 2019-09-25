@@ -1,3 +1,144 @@
+var	exports = {},
+	require = function(path)
+	{
+		var parsedPath = path.match(/(?=[\/\\]).*?[^\/\\]+(?![\/\\])/g),
+			varName    = parsedPath[parsedPath.length - 1].replace(/^[\\//]/g, ""),
+			obj        =  new (function()
+			{
+				this[varName] = exports[varName];
+			})();
+
+		return obj;
+	},
+	__ErrorsCatcher__ = new (function ()
+	{
+		var OOPMethods = new OOP(this),
+			self       = this,
+			parents    = [
+			];
+		
+		this.__init__ = function()
+		{
+			OOPMethods.inheritance(parents);
+		}
+
+		// Внутренние ошибки.
+		this.errors = {
+			'View Error': [{
+				type:    "error",
+				message: "Can't compile view: '{0}', check your views."
+			}, {
+				type:    "error",
+				message: "Parameters for view: '{0}', not found."
+			}],
+
+			'Shedules Error': [{
+					type:    "warning",
+					message: "Shedules: '{0}', not found."
+			},  {
+					type:    "error",
+					message: "Can't run shedule: '{0}'."
+				}
+			],
+
+			'Element Get Function Error': [{
+				type:    "warning",
+				message: "Path: '{0}', have not exist in element."
+			}],
+
+			'Replace Key In String By Core Variable': [{
+				type:    "warning",
+				message: "Variable: '{0}', not found in Core."
+			}],
+
+			'Background Error': [{
+				type:    "warning",
+				message: "Background: '{0}', type '{1}', not found."
+			}, {
+				type:    "warning",
+				message: "Background: '{0}', incorect object."
+			}],
+
+			'Browser Error': [{
+				type:    "warning",
+				message: "Browser not support localStorage"
+			}],
+
+			'Append Method or Elems Key Error': [{
+				type:    "warning",
+				message: "Can't find typeof: '{0}'."
+			}, {
+				type:    "warning",
+				message: "Can't find method for: '{0}'."
+			}],
+
+			'Connect Element Error': [{
+				type:    "warning",
+				message: "Can't find master for: \n'{0}'."
+			}, {
+				type:    "warning",
+				message: "Can't find effect with name: '{0}'\nfor elem: '{1}'."
+			}],
+
+			'Files Errors': [{
+				type:    "error",
+				message: "No one script match '{0}'."
+			}],
+
+			'Effects Error': [{
+				type:    "warning",
+				message: "For effect '{0}', need have element: '{1}' on super."
+			}]
+		}
+
+		this.repeatString = function(str, step)
+		{
+			var curent = "";
+
+			for (var n=0; n < step; n++)
+			{
+				curent += str;
+			}
+
+			return curent;
+		}
+		
+		this.catch = function(errorType, errorNumber, args, browseError)
+		{
+			var error       = this.errors[errorType][errorNumber],
+				body        = this.format(error.message, args),
+				line        = this.repeatString("-", body.length),
+				shablone    = "{title}\n{line}\n{body}\n{line}\nBrowser Error:\n{ge}\n{line}\n\n",
+				browseError = (browseError !== undefined) ? browseError:'Core Error',
+				ignore      = (window['__debug__'] !== undefined) ? window['__debug__']:false,
+				curMessage  = this.format(shablone, {'title': errorType, 'line': line, 'body': body, 'ge': browseError});
+				
+			if (error.type === 'warning' || ignore)
+			{
+				console.log(curMessage);
+			} else {
+				throw curMessage;
+			}
+		}
+
+		this.format = function(str, args)
+		{
+			var toFormat   = ((typeof args) !== "string") ? args:[args],
+				curentLine = str;
+
+			for (var n in toFormat)
+			{
+				var key = "\\{" + n + "\\}";
+				curentLine = curentLine.replace(new RegExp(key, 'g'), toFormat[n]);
+			}
+
+			return curentLine;
+		}
+
+		this.__init__();
+	})();
+
+	
 function _addEventListener(element, event, action)
 {
 	if ((typeof action) !== 'string')
@@ -1925,144 +2066,3 @@ function __Core__(debug)
 
 	this.__init__((debug !== undefined) ? debug:false);
 }
-
-
-var	exports = {},
-	require = function(path)
-	{
-		var parsedPath = path.match(/(?=[\/\\]).*?[^\/\\]+(?![\/\\])/g),
-			varName    = parsedPath[parsedPath.length - 1].replace(/^[\\//]/g, ""),
-			obj        =  new (function()
-			{
-				this[varName] = exports[varName];
-			})();
-
-		return obj;
-	},
-	__ErrorsCatcher__ = new (function ()
-	{
-		var OOPMethods = new OOP(this),
-			self       = this,
-			parents    = [
-			];
-		
-		this.__init__ = function()
-		{
-			OOPMethods.inheritance(parents);
-		}
-
-		// Внутренние ошибки.
-		this.errors = {
-			'View Error': [{
-				type:    "error",
-				message: "Can't compile view: '{0}', check your views."
-			}, {
-				type:    "error",
-				message: "Parameters for view: '{0}', not found."
-			}],
-
-			'Shedules Error': [{
-					type:    "warning",
-					message: "Shedules: '{0}', not found."
-			},  {
-					type:    "error",
-					message: "Can't run shedule: '{0}'."
-				}
-			],
-
-			'Element Get Function Error': [{
-				type:    "warning",
-				message: "Path: '{0}', have not exist in element."
-			}],
-
-			'Replace Key In String By Core Variable': [{
-				type:    "warning",
-				message: "Variable: '{0}', not found in Core."
-			}],
-
-			'Background Error': [{
-				type:    "warning",
-				message: "Background: '{0}', type '{1}', not found."
-			}, {
-				type:    "warning",
-				message: "Background: '{0}', incorect object."
-			}],
-
-			'Browser Error': [{
-				type:    "warning",
-				message: "Browser not support localStorage"
-			}],
-
-			'Append Method or Elems Key Error': [{
-				type:    "warning",
-				message: "Can't find typeof: '{0}'."
-			}, {
-				type:    "warning",
-				message: "Can't find method for: '{0}'."
-			}],
-
-			'Connect Element Error': [{
-				type:    "warning",
-				message: "Can't find master for: \n'{0}'."
-			}, {
-				type:    "warning",
-				message: "Can't find effect with name: '{0}'\nfor elem: '{1}'."
-			}],
-
-			'Files Errors': [{
-				type:    "error",
-				message: "No one script match '{0}'."
-			}],
-
-			'Effects Error': [{
-				type:    "warning",
-				message: "For effect '{0}', need have element: '{1}' on super."
-			}]
-		}
-
-		this.repeatString = function(str, step)
-		{
-			var curent = "";
-
-			for (var n=0; n < step; n++)
-			{
-				curent += str;
-			}
-
-			return curent;
-		}
-		
-		this.catch = function(errorType, errorNumber, args, browseError)
-		{
-			var error       = this.errors[errorType][errorNumber],
-				body        = this.format(error.message, args),
-				line        = this.repeatString("-", body.length),
-				shablone    = "{title}\n{line}\n{body}\n{line}\nBrowser Error:\n{ge}\n{line}\n\n",
-				browseError = (browseError !== undefined) ? browseError:'Core Error',
-				ignore      = (window['__debug__'] !== undefined) ? window['__debug__']:false,
-				curMessage  = this.format(shablone, {'title': errorType, 'line': line, 'body': body, 'ge': browseError});
-				
-			if (error.type === 'warning' || ignore)
-			{
-				console.log(curMessage);
-			} else {
-				throw curMessage;
-			}
-		}
-
-		this.format = function(str, args)
-		{
-			var toFormat   = ((typeof args) !== "string") ? args:[args],
-				curentLine = str;
-
-			for (var n in toFormat)
-			{
-				var key = "\\{" + n + "\\}";
-				curentLine = curentLine.replace(new RegExp(key, 'g'), toFormat[n]);
-			}
-
-			return curentLine;
-		}
-
-		this.__init__();
-	})();
