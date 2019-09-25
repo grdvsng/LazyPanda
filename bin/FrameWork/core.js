@@ -138,16 +138,14 @@ var	exports = {},
 		this.__init__();
 	})();
 
-	
+
 function _addEventListener(element, event, action)
 {
 	if ((typeof action) !== 'string')
 	{
 
-		if (element.addEventListener)
-		{
-			element.addEventListener(event, action);
-		} else {element.attachEvent(event, action);}
+		if (element.addEventListener) {element.addEventListener(event, action);} 
+		else                          {element.attachEvent(event, action);}
 	} else {
 		element['on' + event] = function(){eval(action)};
 	}
